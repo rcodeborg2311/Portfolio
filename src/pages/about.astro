@@ -3,15 +3,145 @@ import PageLayout from '../layouts/PageLayout.astro';
 ---
 
 <PageLayout
-	title="About the studio"
-	description="We shape product, brand, and code for mission-driven teams."
-	eyebrow="Studio"
+	title="About: Ridham Patel"
+	description="CS undergraduate at ASU (GPA 3.89, Dean's List), targeting Quant Developer and Quant Researcher roles at top trading firms."
 >
-	<section class="content-shell py-12 space-y-8"> 
-		<div class="space-y-3 max-w-3xl">
-			<p class="m-0 text-ink text-2xl font-semibold leading-tight">We are a compact, senior studio blending research, design, and engineering to ship resilient products.</p>
-			<p class="m-0 text-muted">We stay close to the people using what we build: quick interviews, async notes, and instrumented releases. Decisions stay traceable so teams know why something shipped, not just what shipped.</p>
-			<p class="m-0 text-muted">When we embed with clients, we bring our own delivery discipline—strong briefs, scoped milestones, and demos that keep stakeholders aligned. The goal: fewer surprises, faster learning.</p>
+	<section class="content-shell py-16">
+		<div class="max-w-3xl space-y-16">
+
+			<!-- Intro -->
+			<div class="space-y-6">
+				<p class="text-sm font-bold uppercase tracking-widest text-base-400">About</p>
+				<h1 class="text-5xl font-extrabold text-base-900 leading-tight tracking-tight">
+					Hi, I'm Ridham.
+				</h1>
+				<p class="text-xl text-base-600 leading-relaxed max-w-2xl">
+					CS undergraduate at Arizona State University, GPA 3.89, Dean's List, graduating May 2026.
+					I spend most of my time building low-latency systems and quantitative research tools,
+					with the goal of landing a Quant Developer or Quant Researcher role at a top trading
+					firm in Summer 2027.
+				</p>
+				<p class="text-base text-base-500 leading-relaxed max-w-2xl">
+					I care more about understanding things deeply than moving fast.
+					Whether it is deriving why the Avellaneda-Stoikov reservation price takes the form it does,
+					or tracing exactly how a Vyukov MPSC queue avoids false sharing,
+					I would rather understand one thing completely than skim ten things at the surface.
+				</p>
+			</div>
+
+			<!-- What I build -->
+			<div class="space-y-6">
+				<h2 class="text-sm font-bold uppercase tracking-widest text-base-400">What I Build</h2>
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<div class="p-6 space-y-2 rounded-xl border border-base-200 bg-base-50 dark:bg-base-900 dark:border-base-700">
+						<p class="text-xs font-bold uppercase tracking-widest text-base-400">Systems</p>
+						<p class="text-base-900 font-semibold text-sm leading-snug">Low-latency C++ infrastructure</p>
+						<p class="text-base-500 text-xs leading-relaxed">
+							Lock-free data structures, cache-line aligned memory layouts, sub-microsecond matching engines.
+						</p>
+					</div>
+					<div class="p-6 space-y-2 rounded-xl border border-base-200 bg-base-50 dark:bg-base-900 dark:border-base-700">
+						<p class="text-xs font-bold uppercase tracking-widest text-base-400">Quant</p>
+						<p class="text-base-900 font-semibold text-sm leading-snug">Quantitative research tools</p>
+						<p class="text-base-500 text-xs leading-relaxed">
+							Stat arb backtesting, Kalman filter hedge ratios, OU-MLE estimation, Monte Carlo risk engines.
+						</p>
+					</div>
+					<div class="p-6 space-y-2 rounded-xl border border-base-200 bg-base-50 dark:bg-base-900 dark:border-base-700">
+						<p class="text-xs font-bold uppercase tracking-widest text-base-400">ML</p>
+						<p class="text-base-900 font-semibold text-sm leading-snug">Reinforcement learning agents</p>
+						<p class="text-base-500 text-xs leading-relaxed">
+							PPO market-making agents, Avellaneda-Stoikov reward functions, microstructure feature engineering.
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Currently -->
+			<div class="space-y-4">
+				<h2 class="text-sm font-bold uppercase tracking-widest text-base-400">Currently</h2>
+				<ul class="space-y-3 text-base text-base-600">
+					<li class="flex gap-4 items-start">
+						<span class="mt-1 h-1.5 w-1.5 rounded-full bg-base-900 shrink-0"></span>
+						<span>Working through John C. Hull's <em>Options, Futures, and Other Derivatives</em> chapter by chapter</span>
+					</li>
+					<li class="flex gap-4 items-start">
+						<span class="mt-1 h-1.5 w-1.5 rounded-full bg-base-900 shrink-0"></span>
+						<span>Drilling probability and stochastic calculus problems from the <em>Green Book</em> (A Practical Guide to Quantitative Finance Interviews)</span>
+					</li>
+					<li class="flex gap-4 items-start">
+						<span class="mt-1 h-1.5 w-1.5 rounded-full bg-base-900 shrink-0"></span>
+						<span>Preparing for Quant Developer and Quant Researcher recruiting cycles for Summer 2027</span>
+					</li>
+					<li class="flex gap-4 items-start">
+						<span class="mt-1 h-1.5 w-1.5 rounded-full bg-base-900 shrink-0"></span>
+						<span>Research Assistant at ASU Biodesign, building Rust-Python simulation tooling with Maturin and Django</span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Targets -->
+			<div class="space-y-4">
+				<h2 class="text-sm font-bold uppercase tracking-widest text-base-400">Where I Want to Be</h2>
+				<p class="text-base text-base-600 leading-relaxed">
+					Citadel, Jane Street, Optiver, Two Sigma, D.E. Shaw. I am targeting the Summer 2027
+					internship cycle as a Quant Developer or Quant Researcher. The goal is not just to pass
+					a technical screen but to be genuinely prepared: strong enough on the math, sharp enough
+					on the systems, and deeply curious about how markets actually work.
+				</p>
+			</div>
+
+			<!-- Outside of code -->
+			<div class="space-y-6">
+				<h2 class="text-sm font-bold uppercase tracking-widest text-base-400">Outside of Code</h2>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+					<div class="space-y-2 p-5 rounded-xl border border-base-100 bg-base-50 dark:bg-base-900 dark:border-base-800">
+						<p class="font-bold text-base-900 text-sm uppercase tracking-wide">Soccer</p>
+						<p class="text-base-500 text-sm leading-relaxed">
+							Football is my reset button. Playing pickup or watching Champions League,
+							I love the spatial decision-making and the fact that a single moment can flip everything.
+						</p>
+					</div>
+
+					<div class="space-y-2 p-5 rounded-xl border border-base-100 bg-base-50 dark:bg-base-900 dark:border-base-800">
+						<p class="font-bold text-base-900 text-sm uppercase tracking-wide">Photography</p>
+						<p class="text-base-500 text-sm leading-relaxed">
+							Street and travel photography, mostly candid moments and light studies.
+							It taught me to slow down and notice what I would otherwise walk past.
+						</p>
+					</div>
+
+					<div class="space-y-2 p-5 rounded-xl border border-base-100 bg-base-50 dark:bg-base-900 dark:border-base-800">
+						<p class="font-bold text-base-900 text-sm uppercase tracking-wide">Reading</p>
+						<p class="text-base-500 text-sm leading-relaxed">
+							Currently: <em>Thinking, Fast and Slow</em> by Kahneman and <em>The One Thing</em> by Gary Keller
+							alongside Hull and the Green Book on the technical side.
+						</p>
+					</div>
+
+					<div class="space-y-2 p-5 rounded-xl border border-base-100 bg-base-50 dark:bg-base-900 dark:border-base-800">
+						<p class="font-bold text-base-900 text-sm uppercase tracking-wide">Guitar</p>
+						<p class="text-base-500 text-sm leading-relaxed">
+							Learning guitar. There is something useful about being a complete beginner again.
+							It keeps you patient with the slow compounding of small, consistent effort.
+						</p>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- Contact -->
+			<div class="space-y-3 border-t border-base-200 pt-10">
+				<h2 class="text-sm font-bold uppercase tracking-widest text-base-400">Get in Touch</h2>
+				<p class="text-base text-base-600">
+					Always happy to talk quant finance, systems programming, or anything in between.
+					Reach me at <a href="mailto:ridham412work@gmail.com" class="underline hover:text-base-900 transition-colors">ridham412work@gmail.com</a>
+					or find me on <a href="https://github.com/rcodeborg2311" target="_blank" rel="noreferrer" class="underline hover:text-base-900 transition-colors">GitHub</a>.
+				</p>
+			</div>
+
 		</div>
 	</section>
 </PageLayout>

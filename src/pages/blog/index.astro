@@ -1,68 +1,30 @@
 ---
-import { getCollection } from 'astro:content';
-import Card from '../../components/Card.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
-
 import { getSite } from '../../utils/consts';
-import { slugify, withBase } from '../../utils/slugify';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-const [featured, ...rest] = posts;
 const site = await getSite();
 ---
 
-<PageLayout title={site.title} description="Blog">
-	<section class="content-shell py-12 space-y-8">
-		{featured && (
-			<div class="grid grid-cols-1">
-				<Card
-					title={featured.data.title}
-					href={withBase(`/blog/${featured.id}/`)}
-					description={featured.data.description}
-					date={featured.data.pubDate}
-					image={featured.data.heroImage}
-					imageAlt={featured.data.title}
-					variant="post"
-				>
-					{featured.data.tags.length > 0 && (
-						<div class="flex flex-wrap gap-2 pt-1 text-sm text-muted">
-							{featured.data.tags.map((tag) => (
-								<a class="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-1 hover:text-ink" href={withBase(`/tags/${slugify(tag)}/`)}>
-									{tag}
-								</a>
-							))}
-						</div>
-					)}
-				</Card>
-			</div>
-		)}
-
-		{rest.length > 0 && (
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-				{rest.map((post) => (
-					<Card
-						title={post.data.title}
-						href={withBase(`/blog/${post.id}/`)}
-						description={post.data.description}
-						date={post.data.pubDate}
-						image={post.data.heroImage}
-						imageAlt={post.data.title}
-						variant="post"
-					>
-						{post.data.tags.length > 0 && (
-							<div class="flex flex-wrap gap-2 pt-1 text-sm text-muted">
-								{post.data.tags.map((tag) => (
-									<a class="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color-mix(in_oklab,var(--color-surface)_95%,transparent)] px-3 py-1 hover:text-ink" href={withBase(`/tags/${slugify(tag)}/`)}>
-										{tag}
-									</a>
-								))}
-							</div>
-						)}
-					</Card>
-				))}
-			</div>
-		)}
+<PageLayout title="Blog: Coming Soon" description="Quantitative research writing launching Summer 2026">
+	<section class="content-shell py-24">
+		<div class="max-w-2xl mx-auto text-center space-y-6">
+			<p class="text-sm font-bold uppercase tracking-widest text-base-500">Blog</p>
+			<h1 class="text-4xl font-bold text-base-900">Coming Soon</h1>
+			<p class="text-lg text-base-500 leading-relaxed">
+				Writing on quantitative research, high-frequency trading systems, and
+				machine learning for finance. Launching alongside the Summer 2026 project builds.
+			</p>
+			<p class="text-base text-base-400">Topics planned:</p>
+			<ul class="text-left inline-block space-y-2 text-base-500">
+				<li>→ Chapter notes: <em>Options, Futures, and Other Derivatives</em> (Hull)</li>
+				<li>→ Walkthroughs of <em>Green Book</em> probability and brainteaser problems</li>
+				<li>→ Building lock-free data structures in C++20</li>
+				<li>→ Kalman filtering for dynamic hedge ratios</li>
+				<li>→ PPO for market microstructure problems</li>
+				<li>→ NASDAQ ITCH 5.0 protocol deep-dive</li>
+				<li>→ Statistical arbitrage: theory to backtester</li>
+			</ul>
+		</div>
 	</section>
 </PageLayout>
+

@@ -1,19 +1,21 @@
 author:
-  name: Dasein
-  role: PhD in Philosophy
-  bio:  Known for contributions to phenomenology, hermeneutics, and existentialism.
-  location: Munich, Germany
+  name: "Ridham Patel"
+  role: "Quant Developer Candidate · BS CS @ ASU"
+  bio: >
+    BS CS at Arizona State University (graduating May 2026), GPA 3.89, Dean's List.
+    I build low-latency systems and quantitative research tools targeting
+    Quant Developer and Quant Researcher roles at top trading firms.
+    Interests: high-frequency trading infrastructure, statistical arbitrage,
+    and reinforcement learning for market microstructure.
+  location: "Phoenix, AZ"
 
 social:
-  - id: "x"
-    label: "X"
-    href: "#_"
   - id: "github"
     label: "GitHub"
-    href: "https://github.com/roicort"
+    href: "https://github.com/rcodeborg2311"
   - id: "linkedin"
     label: "Linkedin"
-    href: "#_"
+    href: "https://www.linkedin.com/in/ridham-patel-2003as12/"
   - id: "email"
     label: "Email"
-    href: "mailto:"
+    href: "mailto:ridham412work@gmail.com"
