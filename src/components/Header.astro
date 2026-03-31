@@ -3,7 +3,6 @@ import { getSite } from "../utils/consts";
 import HeaderLink from "./HeaderLink.astro";
 
 const site = await getSite();
-import SearchModal from "./SearchModal.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 ---
 
@@ -27,8 +26,6 @@ import ThemeToggle from "./ThemeToggle.astro";
       <HeaderLink href="/contact">Contact</HeaderLink>
       <HeaderLink href="/blog">Blog</HeaderLink>
 
-      <SearchModal class="text-xs 2xl:text-lg text-base-900 hover:text-base-500 font-bold uppercase" />
-
       <a
         href="https://github.com/rcodeborg2311"
         target="_blank"
@@ -50,7 +47,6 @@ import ThemeToggle from "./ThemeToggle.astro";
         <HeaderLink href="/about">About</HeaderLink>
         <HeaderLink href="/contact">Contact</HeaderLink>
         <HeaderLink href="/blog">Blog</HeaderLink>
-        <SearchModal class="text-xs 2xl:text-lg hover:text-base-500 font-bold uppercase" />
         <a class="text-xs 2xl:text-lg hover:text-base-500 font-bold uppercase" href="https://github.com/rcodeborg2311" target="_blank" rel="noopener noreferrer">GitHub</a>
         <ThemeToggle class="text-xs 2xl:text-lg hover:text-base-500 font-bold uppercase" />
       </div>
