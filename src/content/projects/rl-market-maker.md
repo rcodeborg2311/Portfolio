@@ -4,6 +4,7 @@ description: "PPO-trained market-making agent in PyTorch quoting BTC-USD bid/ask
 pubDate: 2026-03-10
 heroImage: ../../assets/blog-placeholder-4.png
 tags: ["Python", "Reinforcement Learning", "PyTorch", "Market Making", "Avellaneda-Stoikov", "Plotly Dash"]
+liveUrl: "https://rlmarketmaker-7yho3khdjxpcsppuwappuas.streamlit.app/"
 ---
 
 **Live App:** [rlmarketmaker-7yho3khdjxpcsppuwappuas.streamlit.app](https://rlmarketmaker-7yho3khdjxpcsppuwappuas.streamlit.app/) · **GitHub:** [github.com/rcodeborg2311/rl-market-maker](https://github.com/rcodeborg2311/rl-market-maker)

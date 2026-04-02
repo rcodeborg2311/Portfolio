@@ -5,6 +5,7 @@ pubDate: 2026-03-01
 updatedDate: 2026-03-15
 heroImage: ../../assets/blog-placeholder-about.png
 tags: ["C++20", "HFT", "Systems", "Lock-Free", "WebSocket", "React"]
+liveUrl: "https://lob-engine-lock-free.vercel.app/"
 ---
 
 **Live Demo:** [lob-engine-lock-free.vercel.app](https://lob-engine-lock-free.vercel.app/)

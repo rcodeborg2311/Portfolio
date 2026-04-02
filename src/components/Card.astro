@@ -11,9 +11,12 @@ interface Props {
 		image?: ImageMetadata | string;
 	imageAlt?: string;
 	eyebrow?: string;
+	liveUrl?: string;
+	variant?: string;
+	cta?: string;
 }
 
-const { title, href, description, date, image, imageAlt = '', eyebrow } = Astro.props as Props;
+const { title, href, description, date, image, imageAlt = '', eyebrow, liveUrl } = Astro.props as Props;
 
 const baseDate = typeof date === 'string' ? new Date(date) : date;
 
@@ -29,20 +32,48 @@ const aProps = { href, 'aria-label': `Ver ${title}`, ...(isExternal ? { rel: 'no
 
 		{image && (
 			<figure class="lg:col-span-full relative overflow-hidden bg-[color-mix(in_oklab,var(--color-ink)_4%,var(--color-surface))]">
-				{typeof image === 'string' ? (
-					<img
-						src={image}
-						alt={imageAlt}
-						loading="lazy"
-						class="lg:col-span-full aspect-12/7 object-cover object-top w-full transition duration-400 group-hover:scale-[1.02]"
-					/>
+				{liveUrl ? (
+					<a href={liveUrl} target="_blank" rel="noopener noreferrer" class="group/img block relative" aria-label={`Visit live site for ${title}`} onclick="event.stopPropagation()">
+						{typeof image === 'string' ? (
+							<img
+								src={image}
+								alt={imageAlt}
+								loading="lazy"
+								class="lg:col-span-full aspect-12/7 object-cover object-top w-full transition duration-400 group-hover:scale-[1.02]"
+							/>
+						) : (
+							<Image
+								src={image}
+								alt={imageAlt}
+								loading="lazy"
+								class="lg:col-span-full aspect-12/7 object-cover object-top w-full transition duration-400 group-hover:scale-[1.02]"
+							/>
+						)}
+						<div class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/img:bg-black/50 transition-all duration-300 pointer-events-none">
+							<span class="flex items-center gap-2 text-white font-semibold text-sm opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">
+								Visit Live Site
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+							</span>
+						</div>
+					</a>
 				) : (
-					<Image
-						src={image}
-						alt={imageAlt}
-						loading="lazy"
-						class="lg:col-span-full aspect-12/7 object-cover object-top w-full transition duration-400 group-hover:scale-[1.02]"
-					/>
+					<>
+						{typeof image === 'string' ? (
+							<img
+								src={image}
+								alt={imageAlt}
+								loading="lazy"
+								class="lg:col-span-full aspect-12/7 object-cover object-top w-full transition duration-400 group-hover:scale-[1.02]"
+							/>
+						) : (
+							<Image
+								src={image}
+								alt={imageAlt}
+								loading="lazy"
+								class="lg:col-span-full aspect-12/7 object-cover object-top w-full transition duration-400 group-hover:scale-[1.02]"
+							/>
+						)}
+					</>
 				)}
 			</figure>
 		)}

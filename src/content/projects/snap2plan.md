@@ -5,6 +5,7 @@ pubDate: 2026-02-01
 updatedDate: 2026-03-01
 heroImage: ../../assets/blog-placeholder-2.png
 tags: ["Next.js", "TypeScript", "Supabase", "AI/ML", "SaaS", "PostgreSQL"]
+liveUrl: "https://snap-2-plan.vercel.app/"
 ---
 
 **Live App:** [snap-2-plan.vercel.app](https://snap-2-plan.vercel.app/) · **GitHub:** [github.com/rcodeborg2311/SNAP2PLAN](https://github.com/rcodeborg2311/SNAP2PLAN)

@@ -5,6 +5,7 @@ pubDate: 2026-01-15
 updatedDate: 2026-02-20
 heroImage: ../../assets/blog-placeholder-3.png
 tags: ["Python", "Quantitative Finance", "Statistics", "Backtesting", "Streamlit", "Kalman Filter"]
+liveUrl: "https://statistical-arbitrage-research-platform-dzkhyve2i625wwbzlrknbz.streamlit.app/"
 ---
 
 **Live App:** [statistical-arbitrage-research-platform.streamlit.app](https://statistical-arbitrage-research-platform-dzkhyve2i625wwbzlrknbz.streamlit.app/) · **GitHub:** [github.com/rcodeborg2311/Statistical-Arbitrage-Research-Platform](https://github.com/rcodeborg2311/Statistical-Arbitrage-Research-Platform)
