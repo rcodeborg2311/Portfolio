@@ -2,7 +2,7 @@
 title: "Heston Stochastic Volatility Calibration Engine"
 description: "Production-grade C++20 options pricing and calibration engine implementing the Heston model via Carr-Madan FFT pricing, Differential Evolution global search, and Levenberg-Marquardt local refinement, achieving sub-basis-point RMSE with 139 Catch2 tests and a live Plotly dashboard."
 pubDate: 2026-04-02
-heroImage: ../../assets/ariane-6.png
+heroImage: ../../assets/heston.png
 tags: ["C++20", "Quantitative Finance", "Options Pricing", "Heston Model", "FFT", "Python", "FastAPI"]
 liveUrl: "https://heston-calibration-engine.vercel.app"
 ---

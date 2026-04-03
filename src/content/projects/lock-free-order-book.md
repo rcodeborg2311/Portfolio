@@ -3,7 +3,7 @@ title: "Lock-Free Limit Order Book"
 description: "C++20 price-time priority matching engine processing 2.6M+ orders/sec via lock-free MPSC queue and wait-free SPSC ring buffer, achieving sub-microsecond P99 matching latency with zero heap allocation on the hot path."
 pubDate: 2026-03-01
 updatedDate: 2026-03-15
-heroImage: ../../assets/blog-placeholder-about.png
+heroImage: ../../assets/lob.png
 tags: ["C++20", "HFT", "Systems", "Lock-Free", "WebSocket", "React"]
 liveUrl: "https://lob-engine-lock-free.vercel.app/"
 ---

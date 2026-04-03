@@ -3,7 +3,7 @@ title: "Snap2Plan: AI-Powered Task Management"
 description: "Full-stack SaaS application using Next.js, Supabase, and Claude/Gemini Vision APIs to extract structured tasks from handwritten notes, photos, and voice input, featuring real-time Kanban, Google Calendar sync, and automated email reminders."
 pubDate: 2026-02-01
 updatedDate: 2026-03-01
-heroImage: ../../assets/blog-placeholder-2.png
+heroImage: ../../assets/snap2plan.png
 tags: ["Next.js", "TypeScript", "Supabase", "AI/ML", "SaaS", "PostgreSQL"]
 liveUrl: "https://snap-2-plan.vercel.app/"
 ---

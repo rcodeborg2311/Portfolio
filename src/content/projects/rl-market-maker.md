@@ -2,7 +2,7 @@
 title: "Reinforcement Learning Market-Making Agent"
 description: "PPO-trained market-making agent in PyTorch quoting BTC-USD bid/ask spreads from live Coinbase L2 WebSocket data, achieving 2.4× higher mean episode PnL and 8% lower inventory exposure than a TWAP baseline, featuring a Bloomberg-style live trading dashboard."
 pubDate: 2026-03-10
-heroImage: ../../assets/blog-placeholder-4.png
+heroImage: ../../assets/rl-market-maker.png
 tags: ["Python", "Reinforcement Learning", "PyTorch", "Market Making", "Avellaneda-Stoikov", "Plotly Dash"]
 liveUrl: "https://rlmarketmaker-7yho3khdjxpcsppuwappuas.streamlit.app/"
 ---

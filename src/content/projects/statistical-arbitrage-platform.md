@@ -3,7 +3,7 @@ title: "Statistical Arbitrage Research Platform"
 description: "Production-grade pairs trading backtester in Python using Engle-Granger & Johansen cointegration, Kalman filter dynamic hedge ratios, OU-MLE closed-form estimation, 20+ risk metrics including CVaR/HAC Sharpe, and a 6-tab Streamlit research platform with 163/163 pytest tests passing."
 pubDate: 2026-01-15
 updatedDate: 2026-02-20
-heroImage: ../../assets/blog-placeholder-3.png
+heroImage: ../../assets/stat-arb.png
 tags: ["Python", "Quantitative Finance", "Statistics", "Backtesting", "Streamlit", "Kalman Filter"]
 liveUrl: "https://statistical-arbitrage-research-platform-dzkhyve2i625wwbzlrknbz.streamlit.app/"
 ---
