@@ -309,6 +309,26 @@
 		color: var(--color-ink);
 	}
 
+	/* Dark mode — force all prose child elements to use the light ink color.
+	   Needed because the typography plugin sets color on child selectors
+	   (.prose p, .prose td, etc.) with higher specificity than the parent. */
+	:root[data-theme="dark"] .prose,
+	:root[data-theme="dark"] .prose p,
+	:root[data-theme="dark"] .prose li,
+	:root[data-theme="dark"] .prose td,
+	:root[data-theme="dark"] .prose th,
+	:root[data-theme="dark"] .prose h1,
+	:root[data-theme="dark"] .prose h2,
+	:root[data-theme="dark"] .prose h3,
+	:root[data-theme="dark"] .prose h4,
+	:root[data-theme="dark"] .prose strong,
+	:root[data-theme="dark"] .prose em,
+	:root[data-theme="dark"] .prose code,
+	:root[data-theme="dark"] .prose blockquote,
+	:root[data-theme="dark"] .prose figcaption {
+		color: var(--color-ink);
+	}
+
 	/* Adaptive text — all Tailwind base-* shades map to the theme ink color */
 	.text-base-400,
 	.text-base-500,
