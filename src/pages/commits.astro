@@ -101,6 +101,7 @@ import PageLayout from '../layouts/PageLayout.astro';
   }
   .heat-cell:hover { transform: scale(1.15); }
   #graph-container:hover #graph-hint { opacity: 1 !important; }
+  #graph-container.snake-active #graph-hint { opacity: 0 !important; pointer-events: none !important; }
   #day-label-row { height: var(--cell-h, 32px); }
 </style>
 
@@ -366,6 +367,7 @@ window._initSnake = function() {
     heatmap.style.visibility='hidden';
     canvas.style.display='block';
     snakeUI.style.display='flex';
+    cont.classList.add('snake-active');
     running=true;
     loop=setInterval(step,160);
     draw();
@@ -376,6 +378,7 @@ window._initSnake = function() {
     canvas.style.display='none';
     heatmap.style.visibility='visible';
     snakeUI.style.display='none';
+    cont.classList.remove('snake-active');
     statusEl.textContent='';
   }
 
