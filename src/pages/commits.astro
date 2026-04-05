@@ -17,96 +17,226 @@ import PageLayout from '../layouts/PageLayout.astro';
           class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest opacity-60 hover:opacity-100 hover:text-[color:var(--color-accent)] transition-all duration-200"
         >
           View on GitHub
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </a>
       </div>
       <div class="md:col-span-2 flex items-start">
         <p class="text-base opacity-70 leading-relaxed max-w-lg">
-          Live changelog of every update made to this site — fetched directly from GitHub.
+          Live changelog and contribution heatmap — fetched directly from GitHub.
         </p>
       </div>
     </div>
 
+    <!-- Heatmap -->
+    <div class="mt-10 mb-12">
+      <div class="flex items-center justify-between mb-4">
+        <p class="font-mono text-xs uppercase tracking-widest opacity-50">Last 30 days</p>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-[0.6rem] uppercase tracking-widest opacity-40">Less</span>
+          <span id="legend" class="flex gap-1"></span>
+          <span class="font-mono text-[0.6rem] uppercase tracking-widest opacity-40">More</span>
+        </div>
+      </div>
+
+      <!-- Grid: 7 rows (Mon–Sun) × ~5 weeks columns -->
+      <div id="heatmap" class="inline-grid gap-[4px]" style="grid-template-rows: repeat(7, 1fr);">
+        <!-- filled by JS -->
+      </div>
+
+      <p id="heatmap-loading" class="font-mono text-xs uppercase tracking-widest opacity-40 mt-4">Loading…</p>
+      <p id="heatmap-total" class="mt-4 font-mono text-xs uppercase tracking-widest opacity-50 hidden"></p>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-[color:var(--color-border)] mb-10"></div>
+
     <!-- Commit list -->
-    <div id="commit-list" class="mt-10 flex flex-col divide-y divide-[color:var(--color-border)]">
-      <!-- Loading state -->
+    <p class="font-mono text-xs uppercase tracking-widest opacity-50 mb-6">Recent commits</p>
+    <div id="commit-list" class="flex flex-col divide-y divide-[color:var(--color-border)]">
       <div id="commit-loading" class="py-10 text-center font-mono text-sm opacity-50 tracking-widest uppercase">
         Loading commits…
       </div>
     </div>
 
-    <!-- Error state (hidden by default) -->
     <div id="commit-error" class="hidden mt-10 py-10 text-center font-mono text-sm opacity-50 tracking-widest uppercase">
-      Could not load commits. <a href="https://github.com/rcodeborg2311/Portfolio/commits/main" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 hover:opacity-100">View on GitHub →</a>
+      Could not load commits.
+      <a href="https://github.com/rcodeborg2311/Portfolio/commits/main" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">View on GitHub →</a>
     </div>
 
   </section>
 </PageLayout>
 
+<style>
+  .heat-cell {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+  .heat-cell:hover {
+    transform: scale(1.3);
+    opacity: 1 !important;
+  }
+</style>
+
 <script is:inline>
-  (async function () {
-    const list    = document.getElementById('commit-list');
-    const loading = document.getElementById('commit-loading');
-    const error   = document.getElementById('commit-error');
+(async function () {
+  const REPO    = 'rcodeborg2311/Portfolio';
+  const API     = 'https://api.github.com/repos/' + REPO;
+  const HEADERS = { Accept: 'application/vnd.github+json' };
 
-    try {
-      const res = await fetch(
-        'https://api.github.com/repos/rcodeborg2311/Portfolio/commits?per_page=30',
-        { headers: { Accept: 'application/vnd.github+json' } }
-      );
+  function escapeHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
-      if (!res.ok) throw new Error('GitHub API error');
+  // ── Dates ────────────────────────────────────────────────────
+  const now   = new Date();
+  const since = new Date(now);
+  since.setDate(since.getDate() - 29); // 30 days inclusive
 
-      const commits = await res.json();
+  // Build ordered array of date strings YYYY-MM-DD for last 30 days
+  const days = [];
+  for (let d = new Date(since); d <= now; d.setDate(d.getDate() + 1)) {
+    days.push(d.toISOString().slice(0, 10));
+  }
 
-      loading.remove();
+  // ── Fetch all commits in range (paginate) ────────────────────
+  let allCommits = [];
+  try {
+    const res = await fetch(
+      API + '/commits?since=' + since.toISOString() + '&per_page=100',
+      { headers: HEADERS }
+    );
+    if (res.ok) allCommits = await res.json();
+  } catch (_) {}
 
-      commits.forEach(function (c, i) {
-        const msg       = c.commit.message.split('\n')[0];
-        const author    = c.commit.author.name;
-        const dateRaw   = c.commit.author.date;
-        const sha       = c.sha.slice(0, 7);
-        const url       = c.html_url;
-        const date      = new Date(dateRaw).toLocaleDateString('en-US', {
-          month: 'short', day: 'numeric', year: 'numeric'
-        });
+  // Count per day
+  const counts = {};
+  days.forEach(function(d) { counts[d] = 0; });
+  allCommits.forEach(function(c) {
+    const day = (c.commit.author.date || '').slice(0, 10);
+    if (counts[day] !== undefined) counts[day]++;
+  });
 
-        const el = document.createElement('div');
-        el.className = 'group flex flex-col sm:flex-row sm:items-start gap-3 py-5 hover:bg-[color:var(--color-surface)] rounded-xl px-3 -mx-3 transition-colors duration-200';
-        el.innerHTML =
-          '<div class="shrink-0 w-24">' +
-            '<a href="' + url + '" target="_blank" rel="noopener noreferrer" ' +
-               'class="font-mono text-xs tracking-widest opacity-50 group-hover:opacity-100 group-hover:text-[color:var(--color-accent)] transition-all duration-200">' +
-              sha +
-            '</a>' +
-          '</div>' +
-          '<div class="flex-1 min-w-0">' +
-            '<p class="text-base font-semibold leading-snug">' + escapeHtml(msg) + '</p>' +
-            '<p class="mt-1 text-xs opacity-55 font-mono tracking-wide">' +
-              escapeHtml(author) + ' · ' + date +
-            '</p>' +
-          '</div>' +
-          '<a href="' + url + '" target="_blank" rel="noopener noreferrer" ' +
-             'class="shrink-0 text-xs font-semibold uppercase tracking-widest opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity duration-200 self-center">' +
-            'View →' +
-          '</a>';
+  const maxCount = Math.max(1, ...Object.values(counts));
 
-        list.appendChild(el);
+  // ── Draw heatmap ─────────────────────────────────────────────
+  const heatmap = document.getElementById('heatmap');
+  const loading = document.getElementById('heatmap-loading');
+  const total   = document.getElementById('heatmap-total');
+  const legend  = document.getElementById('legend');
+
+  // Legend squares
+  [0, 1, 2, 3, 4].forEach(function(level) {
+    const sq = document.createElement('span');
+    sq.className = 'heat-cell';
+    sq.style.background = 'var(--color-accent)';
+    sq.style.opacity = level === 0 ? '0.08' : (0.2 + level * 0.2).toFixed(2);
+    legend.appendChild(sq);
+  });
+
+  // Figure out which day of week `since` falls on (0=Sun)
+  const startDow = since.getDay(); // 0=Sun,1=Mon,...
+
+  // We lay out Mon–Sun rows (row 0 = Mon = DOW 1)
+  // Add leading empty cells so the first day aligns correctly
+  const rowOfDay = function(dateStr) {
+    const dow = new Date(dateStr).getDay(); // 0=Sun
+    return (dow + 6) % 7; // Mon=0, Tue=1, ... Sun=6
+  };
+
+  // Calculate number of columns needed
+  const firstRow = rowOfDay(days[0]);
+  const totalCells = firstRow + days.length;
+  const cols = Math.ceil(totalCells / 7);
+  heatmap.style.gridTemplateColumns = 'repeat(' + cols + ', 14px)';
+
+  // Fill leading empty cells
+  for (let i = 0; i < firstRow; i++) {
+    const empty = document.createElement('span');
+    empty.className = 'heat-cell';
+    empty.style.background = 'transparent';
+    heatmap.appendChild(empty);
+  }
+
+  // Fill day cells
+  days.forEach(function(day) {
+    const count = counts[day] || 0;
+    const cell  = document.createElement('span');
+    cell.className = 'heat-cell';
+
+    if (count === 0) {
+      cell.style.background = 'var(--color-accent)';
+      cell.style.opacity = '0.08';
+    } else {
+      const intensity = Math.min(count / maxCount, 1);
+      const opacity   = 0.25 + intensity * 0.75;
+      cell.style.background = 'var(--color-accent)';
+      cell.style.opacity = opacity.toFixed(2);
+      cell.style.boxShadow = count > 1
+        ? '0 0 6px color-mix(in oklab, var(--color-accent) ' + Math.round(intensity * 50) + '%, transparent)'
+        : '';
+    }
+
+    // Tooltip
+    const label = count === 0
+      ? 'No commits on ' + day
+      : count + ' commit' + (count > 1 ? 's' : '') + ' on ' + day;
+    cell.title = label;
+
+    heatmap.appendChild(cell);
+  });
+
+  loading.remove();
+  const sum = Object.values(counts).reduce(function(a, b) { return a + b; }, 0);
+  total.textContent = sum + ' commits in the last 30 days';
+  total.classList.remove('hidden');
+
+  // ── Fetch recent commits for the list ────────────────────────
+  const listEl       = document.getElementById('commit-list');
+  const commitLoad   = document.getElementById('commit-loading');
+  const commitError  = document.getElementById('commit-error');
+
+  try {
+    const res2 = await fetch(API + '/commits?per_page=30', { headers: HEADERS });
+    if (!res2.ok) throw new Error();
+    const commits = await res2.json();
+
+    commitLoad.remove();
+
+    commits.forEach(function(c) {
+      const msg    = c.commit.message.split('\n')[0];
+      const author = c.commit.author.name;
+      const date   = new Date(c.commit.author.date).toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric'
       });
+      const sha = c.sha.slice(0, 7);
+      const url = c.html_url;
 
-    } catch (e) {
-      loading.remove();
-      error.classList.remove('hidden');
-    }
+      const el = document.createElement('div');
+      el.className = 'group flex flex-col sm:flex-row sm:items-center gap-3 py-5 hover:bg-[color:var(--color-surface)] rounded-xl px-3 -mx-3 transition-colors duration-200 cursor-pointer';
+      el.onclick = function() { window.open(url, '_blank', 'noopener'); };
 
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-  })();
+      el.innerHTML =
+        '<a href="' + url + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" ' +
+           'class="shrink-0 font-mono text-xs tracking-widest opacity-50 group-hover:opacity-100 group-hover:text-[color:var(--color-accent)] transition-all duration-200 w-16">' +
+          escapeHtml(sha) +
+        '</a>' +
+        '<div class="flex-1 min-w-0">' +
+          '<p class="text-base font-semibold leading-snug truncate">' + escapeHtml(msg) + '</p>' +
+          '<p class="mt-0.5 text-xs opacity-55 font-mono tracking-wide">' +
+            escapeHtml(author) + ' · ' + escapeHtml(date) +
+          '</p>' +
+        '</div>' +
+        '<span class="shrink-0 text-xs font-semibold uppercase tracking-widest opacity-0 group-hover:opacity-60 transition-opacity duration-200">View →</span>';
+
+      listEl.appendChild(el);
+    });
+  } catch (_) {
+    commitLoad && commitLoad.remove();
+    commitError.classList.remove('hidden');
+  }
+})();
 </script>
