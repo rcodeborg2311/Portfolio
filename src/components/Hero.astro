@@ -49,17 +49,17 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
       <!-- Role + location -->
       <div class="space-y-1">
         {role && (
-          <p class="text-xs font-semibold uppercase tracking-widest">{role}</p>
+          <p class="text-base font-semibold uppercase tracking-widest">{role}</p>
         )}
         {location && (
-          <p class="text-xs opacity-70 tracking-wide">{location}</p>
+          <p class="text-base opacity-70 tracking-wide">{location}</p>
         )}
       </div>
 
       <!-- Bio -->
       <div class="md:col-span-1">
         {description && (
-          <p class="leading-relaxed text-sm">{description}</p>
+          <p class="leading-relaxed text-base">{description}</p>
         )}
       </div>
 
@@ -72,14 +72,14 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
                 href={action.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                class={`text-xs font-semibold uppercase tracking-widest transition-opacity duration-200 ${i === 0 ? 'opacity-100 hover:opacity-60' : 'opacity-70 hover:opacity-100'}`}
+                class={`text-base font-semibold uppercase tracking-widest transition-opacity duration-200 ${i === 0 ? 'opacity-100 hover:opacity-60' : 'opacity-70 hover:opacity-100'}`}
               >
                 {action.label} →
               </a>
             ) : (
               <a
                 href={withBase(action.href)}
-                class={`text-xs font-semibold uppercase tracking-widest transition-opacity duration-200 ${i === 0 ? 'opacity-100 hover:opacity-60' : 'opacity-70 hover:opacity-100'}`}
+                class={`text-base font-semibold uppercase tracking-widest transition-opacity duration-200 ${i === 0 ? 'opacity-100 hover:opacity-60' : 'opacity-70 hover:opacity-100'}`}
               >
                 {action.label} →
               </a>
