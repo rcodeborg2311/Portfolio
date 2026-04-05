@@ -4,7 +4,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 
 <PageLayout
 	title="About: Ridham Patel"
-	description="CS undergraduate at ASU, interested in quantitative finance, low-latency systems, and market microstructure."
+	description="CS student at ASU. I build things, take photos, and think about markets."
 >
 	<section class="content-shell py-16">
 		<div class="max-w-2xl space-y-16">
@@ -12,108 +12,47 @@ import PageLayout from '../layouts/PageLayout.astro';
 			<!-- Intro -->
 			<div class="space-y-5 anim anim-1">
 				<p class="eyebrow" style="font-size:0.85rem;letter-spacing:0.32em;font-weight:700;">About</p>
-				<h1 class="text-2xl font-bold leading-snug">
-					Hi, I'm Ridham.
-				</h1>
+				<h1 class="text-2xl font-bold leading-snug">Hi, I'm Ridham.</h1>
 				<p class="leading-relaxed">
-					CS undergraduate at Arizona State University, GPA 3.89, Dean's List, graduating May 2026.
-					I spend most of my time building low-latency systems and quantitative research tools.
-				</p>
-				<p class="opacity-60 leading-relaxed">
-					I care more about understanding things deeply than moving fast.
-					Whether it's deriving why the Avellaneda-Stoikov reservation price takes the form it does,
-					or tracing exactly how a Vyukov MPSC queue avoids false sharing —
-					I'd rather understand one thing completely than skim ten things at the surface.
+					CS student at Arizona State University, graduating May 2026.
+					I spend most of my time studying markets and building systems that interact with them.
+					Outside of that, I play soccer, read, learn guitar, and shoot photography whenever
+					I get the chance to slow down and notice something worth framing.
 				</p>
 			</div>
 
-			<!-- What I build -->
-			<div class="space-y-5 anim anim-2">
-				<h2 class="text-base font-bold uppercase tracking-widest">What I Build</h2>
-				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+			<!-- Photography -->
+			<div class="space-y-6 anim anim-2">
+				<div class="flex items-center justify-between">
+					<h2 class="text-base font-bold uppercase tracking-widest">Photography</h2>
+					<p class="font-mono text-xs uppercase tracking-widest opacity-40">Street · Travel · Light</p>
+				</div>
 
-					<div class="p-5 space-y-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
-						<p class="eyebrow">Systems</p>
-						<p class="font-semibold text-sm leading-snug">Low-latency C++ infrastructure</p>
-						<p class="text-xs opacity-55 leading-relaxed">
-							Lock-free data structures, cache-line aligned memory layouts, sub-microsecond matching engines.
-						</p>
+				<!-- Photo grid — drop your images in src/assets/ and replace the placeholders -->
+				<div class="grid grid-cols-2 gap-3">
+
+					<!-- Large featured photo — spans both columns -->
+					<div class="col-span-2 aspect-[16/9] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Featured photo</p>
 					</div>
 
-					<div class="p-5 space-y-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
-						<p class="eyebrow">Quant</p>
-						<p class="font-semibold text-sm leading-snug">Quantitative research tools</p>
-						<p class="text-xs opacity-55 leading-relaxed">
-							Stat arb backtesting, Kalman filter hedge ratios, OU-MLE estimation, Monte Carlo risk engines.
-						</p>
+					<!-- Row of 3 -->
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
+					</div>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
 					</div>
 
-					<div class="p-5 space-y-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
-						<p class="eyebrow">ML</p>
-						<p class="font-semibold text-sm leading-snug">Reinforcement learning agents</p>
-						<p class="text-xs opacity-55 leading-relaxed">
-							PPO market-making agents, Avellaneda-Stoikov reward functions, microstructure feature engineering.
-						</p>
+					<!-- Portrait + landscape pair -->
+					<div class="aspect-[3/4] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
+					</div>
+					<div class="aspect-[3/4] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
 					</div>
 
 				</div>
-			</div>
-
-			<!-- Currently -->
-			<div class="space-y-5 anim anim-3">
-				<h2 class="text-base font-bold uppercase tracking-widest">Currently</h2>
-				<ul class="space-y-4">
-					{[
-						"Working through John C. Hull's Options, Futures, and Other Derivatives chapter by chapter",
-						"Drilling probability and stochastic calculus from the Green Book (A Practical Guide to Quantitative Finance Interviews)",
-						"Preparing for Quant Developer and Quant Researcher recruiting cycles for Summer 2027",
-						"Research Assistant at ASU Biodesign — building Rust-Python simulation tooling with Maturin and Django",
-					].map((item) => (
-						<li class="flex gap-4 items-start">
-							<span class="mt-[0.45rem] h-1 w-1 rounded-full bg-[color:var(--color-ink)] opacity-40 shrink-0"></span>
-							<span class="opacity-70 text-sm leading-relaxed">{item}</span>
-						</li>
-					))}
-				</ul>
-			</div>
-
-			<!-- Targets -->
-			<div class="space-y-4">
-				<h2 class="text-base font-bold uppercase tracking-widest">Where I Want to Be</h2>
-				<p class="opacity-65 leading-relaxed text-sm">
-					Citadel, Jane Street, Optiver, Two Sigma, D.E. Shaw. Targeting the Summer 2027
-					internship cycle as a Quant Developer or Quant Researcher. The goal isn't just to pass
-					a technical screen — it's to be genuinely prepared: strong on the math, sharp on the
-					systems, and deeply curious about how markets actually work.
-				</p>
-			</div>
-
-			<!-- Outside of code -->
-			<div class="space-y-5">
-				<h2 class="text-base font-bold uppercase tracking-widest">Outside of Code</h2>
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					{[
-						{ title: "Soccer", body: "Football is my reset button. Playing pickup or watching Champions League — I love the spatial decision-making and the fact that a single moment can flip everything." },
-						{ title: "Photography", body: "Street and travel photography, mostly candid moments and light studies. It taught me to slow down and notice what I'd otherwise walk past." },
-						{ title: "Reading", body: "Currently: Thinking, Fast and Slow by Kahneman alongside Hull and the Green Book on the technical side." },
-						{ title: "Guitar", body: "Learning guitar. There's something useful about being a complete beginner again — it keeps you patient with the slow compounding of consistent effort." },
-					].map(({ title, body }) => (
-						<div class="p-5 space-y-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
-							<p class="eyebrow">{title}</p>
-							<p class="text-sm opacity-60 leading-relaxed">{body}</p>
-						</div>
-					))}
-				</div>
-			</div>
-
-			<!-- Contact -->
-			<div class="space-y-3 border-t border-[color:var(--color-border)] pt-10">
-				<h2 class="text-base font-bold uppercase tracking-widest">Get in Touch</h2>
-				<p class="opacity-65 text-sm leading-relaxed">
-					Always happy to talk quant finance, systems programming, or anything in between.
-					Reach me at <a href="mailto:ridham412work@gmail.com" class="underline underline-offset-2 hover:opacity-100 transition-opacity">ridham412work@gmail.com</a>
-					or find me on <a href="https://github.com/rcodeborg2311" target="_blank" rel="noreferrer" class="underline underline-offset-2 hover:opacity-100 transition-opacity">GitHub</a>.
-				</p>
 			</div>
 
 		</div>
