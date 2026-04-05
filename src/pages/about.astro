@@ -7,54 +7,80 @@ import PageLayout from '../layouts/PageLayout.astro';
 	description="CS student at ASU. I build things, take photos, and think about markets."
 >
 	<section class="content-shell py-16">
-		<div class="max-w-2xl space-y-16">
 
-			<!-- Intro -->
-			<div class="space-y-5 anim anim-1">
-				<p class="eyebrow" style="font-size:0.85rem;letter-spacing:0.32em;font-weight:700;">About</p>
-				<h1 class="text-2xl font-bold leading-snug">Hi, I'm Ridham.</h1>
-				<p class="leading-relaxed">
-					CS student at Arizona State University, graduating May 2026.
-					I spend most of my time studying markets and building systems that interact with them.
-					Outside of that, I play soccer, read, learn guitar, and shoot photography whenever
-					I get the chance to slow down and notice something worth framing.
-				</p>
+		<!-- Two-column: text left, photos right -->
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+			<!-- Left: intro -->
+			<div class="space-y-10 anim anim-1">
+				<div class="space-y-5">
+					<p class="eyebrow" style="font-size:0.85rem;letter-spacing:0.32em;font-weight:700;">About</p>
+					<h1 class="text-2xl font-bold leading-snug">Hi, I'm Ridham.</h1>
+					<p class="leading-relaxed">
+						CS student at Arizona State University, graduating May 2026.
+						I spend most of my time studying markets and building systems that interact with them.
+						Outside of that, I play soccer, read, learn guitar, and shoot photography whenever
+						I get the chance to slow down and notice something worth framing.
+					</p>
+				</div>
+
+				<!-- Hobbies -->
+				<div class="space-y-4">
+					<h2 class="text-base font-bold uppercase tracking-widest">Outside of Code</h2>
+					<div class="grid grid-cols-2 gap-3">
+						{[
+							{ label: "Soccer",      desc: "My reset button. Pickup games, Champions League, spatial decision-making." },
+							{ label: "Guitar",      desc: "Still a beginner. Useful reminder that consistency beats talent." },
+							{ label: "Reading",     desc: "Kahneman, Hull, anything that changes how I think." },
+							{ label: "Photography", desc: "Street and travel. Candid moments, light, and things easy to walk past." },
+						].map(({ label, desc }) => (
+							<div class="p-4 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] space-y-1">
+								<p class="eyebrow" style="font-size:0.75rem;letter-spacing:0.28em;">{label}</p>
+								<p class="text-sm opacity-60 leading-relaxed">{desc}</p>
+							</div>
+						))}
+					</div>
+				</div>
 			</div>
 
-			<!-- Photography -->
-			<div class="space-y-6 anim anim-2">
-				<div class="flex items-center justify-between">
+			<!-- Right: photography grid -->
+			<div class="space-y-3 anim anim-2">
+				<div class="flex items-center justify-between mb-1">
 					<h2 class="text-base font-bold uppercase tracking-widest">Photography</h2>
 					<p class="font-mono text-xs uppercase tracking-widest opacity-40">Street · Travel · Light</p>
 				</div>
 
-				<!-- Photo grid — drop your images in src/assets/ and replace the placeholders -->
-				<div class="grid grid-cols-2 gap-3">
-
-					<!-- Large featured photo — spans both columns -->
-					<div class="col-span-2 aspect-[16/9] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Featured photo</p>
-					</div>
-
-					<!-- Row of 3 -->
-					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
-					</div>
-					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
-					</div>
-
-					<!-- Portrait + landscape pair -->
-					<div class="aspect-[3/4] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
-					</div>
-					<div class="aspect-[3/4] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
-					</div>
-
+				<!-- Featured wide -->
+				<div class="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+					<p class="font-mono text-xs uppercase tracking-widest opacity-25">Featured photo</p>
 				</div>
+
+				<!-- 2-col row -->
+				<div class="grid grid-cols-2 gap-3">
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
+					</div>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
+					</div>
+				</div>
+
+				<!-- 3-col row -->
+				<div class="grid grid-cols-3 gap-3">
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-[0.55rem] uppercase tracking-widest opacity-25">Photo</p>
+					</div>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-[0.55rem] uppercase tracking-widest opacity-25">Photo</p>
+					</div>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
+						<p class="font-mono text-[0.55rem] uppercase tracking-widest opacity-25">Photo</p>
+					</div>
+				</div>
+
 			</div>
 
 		</div>
+
 	</section>
 </PageLayout>
