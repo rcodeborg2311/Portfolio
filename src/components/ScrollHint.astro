@@ -25,12 +25,12 @@
     style="
       writing-mode: vertical-rl;
       text-orientation: mixed;
-      font-size: 0.6rem;
+      font-size: 0.65rem;
       font-weight: 700;
       letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--color-ink);
-      opacity: 0.45;
+      opacity: 0.75;
       transition: opacity 300ms ease;
     "
   ></span>
@@ -42,10 +42,10 @@
     viewBox="0 0 10 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    style="opacity: 0.35; animation: sh-bounce 1.6s ease-in-out infinite;"
+    style="opacity: 0.65; animation: sh-bounce 1.6s ease-in-out infinite;"
   >
-    <line x1="5" y1="0" x2="5" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <polyline points="1,9 5,14 9,9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <line x1="5" y1="0" x2="5" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <polyline points="1,9 5,14 9,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </svg>
 </div>
 
@@ -115,7 +115,7 @@
         label.style.opacity = '0';
         setTimeout(() => {
           label.textContent = nextLabel;
-          label.style.opacity = '0.45';
+          label.style.opacity = '0.75';
         }, 150);
         currentLabel = nextLabel;
       }
