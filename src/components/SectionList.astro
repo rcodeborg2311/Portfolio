@@ -47,7 +47,7 @@ function isExternal(href: string) {
         >
             <div class="lg:sticky lg:top-24 lg:z-40 self-start">
                 <h2
-                    class="text-sm 2xl:text-xl text-base-900 font-bold uppercase"
+                    class="text-base 2xl:text-xl text-base-900 font-bold uppercase"
                 >
                     {heading}
                 </h2>
@@ -58,7 +58,7 @@ function isExternal(href: string) {
                     items.map((item) => (
                         <article class="group relative grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
                             <div class="lg:col-span-2">
-                                <h3 class="text-sm 2xl:text-xl text-base-900 font-bold uppercase">
+                                <h3 class="text-base 2xl:text-xl text-base-900 font-bold uppercase">
                                     {item.href ? (
                                         <a
                                             href={item.href}
@@ -87,14 +87,14 @@ function isExternal(href: string) {
                                     )}
                                 </h3>
                                 {item.description && (
-                                    <p class="text-xs 2xl:text-lg mt-1 text-base-600">
+                                    <p class="text-sm 2xl:text-lg mt-1 text-base-600">
                                         {item.description}
                                     </p>
                                 )}
                             </div>
 
                             {item.datetime && (
-                                <p class="text-xs 2xl:text-lg text-base-600 lg:ml-auto">
+                                <p class="text-sm 2xl:text-lg text-base-600 lg:ml-auto">
                                     <time datetime={item.datetime}>
                                         {item.dateLabel ?? item.datetime}
                                     </time>

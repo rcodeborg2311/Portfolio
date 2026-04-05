@@ -80,15 +80,15 @@ const aProps = { href, 'aria-label': `Ver ${title}`, ...(isExternal ? { rel: 'no
 
 		<div class="lg:col-span-2">
 			{eyebrow && <p class="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--color-accent)]">{eyebrow}</p>}
-			<h3 class="text-sm 2xl:text-xl text-[color:var(--color-primary)] font-bold uppercase">
+			<h3 class="text-base 2xl:text-xl text-[color:var(--color-primary)] font-bold uppercase">
 				<span class="relative z-10">{title}</span>
 			</h3>
 
-			{description && <p class="text-xs 2xl:text-lg mt-1 text-[color:var(--color-ink)]">{description}</p>}
+			{description && <p class="text-sm 2xl:text-lg mt-1 text-[color:var(--color-ink)] line-clamp-2 md:line-clamp-none">{description}</p>}
 		</div>
 
 		{baseDate && (
-			<p class="text-xs 2xl:text-lg text-[color:var(--color-ink)] lg:ml-auto">
+			<p class="text-sm 2xl:text-lg text-[color:var(--color-ink)] lg:ml-auto">
 				<time datetime={baseDate.toISOString()}>
 					<FormattedDate date={baseDate} />
 				</time>

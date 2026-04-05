@@ -6,7 +6,7 @@
 	--color-muted: var(--color-ink);
 	--color-paper: #ffffff;
 	--color-surface: #ffffff;
-	--color-border: color-mix(in oklab, var(--color-ink) 14%, transparent);
+	--color-border: color-mix(in oklab, var(--color-ink) 22%, transparent);
 	--radius-card: 24px;
 	--grid-line: color-mix(in oklab, var(--color-ink) 10%, transparent);
 }
@@ -29,7 +29,7 @@
 		--color-muted: var(--color-ink);
 		--color-paper: #0d0d10;
 		--color-surface: #131318;
-		--color-border: color-mix(in oklab, var(--color-ink) 16%, transparent);
+		--color-border: color-mix(in oklab, var(--color-ink) 24%, transparent);
 		--grid-line: color-mix(in oklab, var(--color-ink) 10%, transparent);
 	}
 	*,
@@ -44,10 +44,11 @@
 		display: flex;
 		flex-direction: column;
 		font-family: var(--font-sans);
-		line-height: 1.6;
+		font-size: 1.0625rem;
+		line-height: 1.65;
 		color: var(--color-ink);
 		background-color: var(--color-paper);
-	} 
+	}
 
 	a {
 		color: inherit;
@@ -277,7 +278,7 @@
 
 	.post-article p {
 		margin: 0;
-		color: var(--color-muted);
+		color: var(--color-ink);
 	}
 
 	.post-article h2,
@@ -288,6 +289,8 @@
 
 	/* Prose typography — override all @tailwindcss/typography colors to use theme ink */
 	.prose {
+		font-size: 1.0625rem;
+		line-height: 1.75;
 		--tw-prose-body: var(--color-ink);
 		--tw-prose-headings: var(--color-ink);
 		--tw-prose-lead: var(--color-ink);
