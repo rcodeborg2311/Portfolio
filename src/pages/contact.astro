@@ -25,10 +25,7 @@ import Social from '../components/Social.astro';
 				<h2 class="text-base font-bold uppercase tracking-widest">Reach Me Directly</h2>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 
-					<a
-						href="mailto:ridham412work@gmail.com"
-						class="group flex flex-col p-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] hover:border-[color:var(--color-accent)] transition-colors duration-200 space-y-3"
-					>
+					<div class="group relative flex flex-col p-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] hover:border-[color:var(--color-accent)] transition-colors duration-200 space-y-3">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-70 group-hover:opacity-100 group-hover:stroke-[color:var(--color-accent)] transition-all duration-200">
 							<rect width="20" height="16" x="2" y="4" rx="2"/>
 							<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
@@ -38,7 +35,26 @@ import Social from '../components/Social.astro';
 							<p class="text-sm opacity-70 group-hover:opacity-100 break-all transition-opacity duration-200">ridham412work@gmail.com</p>
 							<p class="text-xs opacity-40 leading-relaxed">Best for recruiting or collaboration.</p>
 						</div>
-					</a>
+						<!-- Copy + mailto buttons — visible on hover -->
+						<div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+							<button
+								id="copy-email-btn"
+								title="Copy email"
+								class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--color-accent)] text-[color:var(--color-accent)] text-xs font-semibold uppercase tracking-widest hover:bg-[color:var(--color-accent)] hover:text-white transition-all duration-150"
+							>
+								<svg id="copy-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+								</svg>
+								<span id="copy-label">Copy</span>
+							</button>
+							<a
+								href="mailto:ridham412work@gmail.com"
+								class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--color-border)] text-xs font-semibold uppercase tracking-widest hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent)] transition-all duration-150"
+							>
+								Open →
+							</a>
+						</div>
+					</div>
 
 					<a
 						href="https://www.linkedin.com/in/ridham-patel-2003as12/"
@@ -87,3 +103,20 @@ import Social from '../components/Social.astro';
 
 	<Social />
 </PageLayout>
+
+<script is:inline>
+  document.getElementById('copy-email-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText('ridham412work@gmail.com').then(function() {
+      const label = document.getElementById('copy-label');
+      const icon  = document.getElementById('copy-icon');
+      label.textContent = 'Copied!';
+      icon.innerHTML = '<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      setTimeout(function() {
+        label.textContent = 'Copy';
+        icon.innerHTML = '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>';
+      }, 2000);
+    });
+  });
+</script>
