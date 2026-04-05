@@ -1,49 +1,11 @@
 ---
-/**
- * ProjectList.astro
- *
- * Reusable Projects section component.
- *
- * Props:
- * - heading?: string (default: "Projects")
- * - items: Array of project-like objects. Each item may be either:
- *     - a plain object: { title, description?, link?, image? }
- *     - a collection item: { data: { title, description?, link?, image? } }
- * - limit?: number (default: 4) -> how many items to show
- * - viewAllHref?: string -> optional "View all projects" link
- * - viewAllLabel?: string (default: "View all projects")
- *
- * Slots:
- * - default: optional slot rendered in the same spot as the "View all" link
- *
- * Behavior:
- * - Renders the same markup/styling as the original index Projects section.
- * - Link targets to external URLs get `target="_blank"` and `rel="noopener noreferrer"`.
- */
 import { Image } from "astro:assets";
-import Card from "./Card.astro";
 import { getCollection } from 'astro:content';
 import { withBase } from '../utils/slugify';
 
-interface RawProject {
-    // Either the flattened shape...
-    title?: string;
-    description?: string;
-    link?: string;
-    image?: any;
-
-    // ...or the content collection shape:
-    data?: {
-        title?: string;
-        description?: string;
-        link?: string;
-        image?: any;
-    };
-}
-
 export interface Props {
     heading?: string;
-    items: RawProject[];
+    items?: any[];
     limit?: number;
     viewAllHref?: string;
     viewAllLabel?: string;
@@ -52,76 +14,195 @@ export interface Props {
 let {
     heading = "Projects",
     items = [],
-    limit = 4,
-    viewAllHref,
+    limit = 5,
+    viewAllHref = "/projects/",
     viewAllLabel = "View all projects",
 } = Astro.props as Props;
 
-function getProjectData(item: RawProject) {
-    return item && (item as any).data ? (item as any).data : item;
-}
-
-function isExternal(href?: string) {
-    return typeof href === "string" && /^https?:\/\//i.test(href);
-}
-
 if (items.length === 0) {
-    console.warn('[ProjectList] No items provided; fetching from "projects" collection.');
-    items = items.concat(await getCollection("projects")).sort(
+    items = (await getCollection("projects")).sort(
         (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
     );
 }
 
-const visibleItems = typeof limit === "number" ? items.slice(0, limit) : items;
+const visible = items.slice(0, limit);
+const [featured, ...rest] = visible;
 
-const baseUrl =
-    !import.meta.env.BASE_URL || import.meta.env.BASE_URL === "/"
-        ? ""
-        : import.meta.env.BASE_URL;
+function pd(item: any) {
+    return item?.data ?? item;
+}
+
+const baseUrl = !import.meta.env.BASE_URL || import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL;
+
+function projectHref(item: any) {
+    return item.id ? withBase(`/projects/${item.id}/`) : pd(item).link;
+}
 ---
 
 <section>
-    <div class="max-w-[90rem] mx-auto pt-8 px-8">
-        <div
-            class="grid grid-cols-1 gap-y-24 md:grid-cols-3 border-b py-24 border-base-200"
-        >
-            <div class="lg:sticky lg:top-24 lg:z-40 self-start">
-                <h2
-                    class="text-base 2xl:text-xl text-base-900 font-bold uppercase"
+    <div class="max-w-[90rem] mx-auto px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 border-b border-[color:var(--color-border)] py-20 gap-y-12">
+
+            <!-- Sticky label -->
+            <div class="lg:sticky lg:top-24 lg:z-40 self-start flex flex-col gap-4">
+                <h2 class="text-base font-bold uppercase tracking-widest">{heading}</h2>
+                <a
+                    href={`${baseUrl}${viewAllHref}`}
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
                 >
-                    {heading}
-                </h2>
+                    {viewAllLabel}
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
             </div>
 
-            <div
-                class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-y-20 gap-x-8"
-            >
-                {
-                    visibleItems.map((item) => {
-                        const p = getProjectData(item) || {};
-                        const id = (item as any).id;
-                        const href = id ? withBase(`/projects/${id}/`) : p.link;
-                        const external = isExternal(href);
+            <!-- Cards -->
+            <div class="md:col-span-2 flex flex-col gap-6">
 
-                        return (
-                            <Card
-                                title={p.title}
-                                href={href}
-                                image={p.image}
-                                imageAlt={p.title}
-                                description={p.description}
-                                variant="project"
-                                cta="View project →"
-                                liveUrl={p.liveUrl}
-                            />
-                        );
-                    })
-                }
-                <Card
-                    title={viewAllLabel}
-                    href={`${baseUrl + (viewAllHref ?? '/projects/')}`}
-                    variant="project"
-                />
+                <!-- Featured card -->
+                {featured && (() => {
+                    const p = pd(featured);
+                    const href = projectHref(featured);
+                    return (
+                        <article
+                            class="group relative rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_-12px_color-mix(in_oklab,var(--color-ink)_20%,transparent)] cursor-pointer"
+                            data-href={href}
+                            role="link"
+                            tabindex="0"
+                            onclick="if(!event.target.closest('a,button')){location.href=this.dataset.href}"
+                            onkeydown="if((event.key==='Enter'||event.key===' ')&&!event.target.closest('a,button')){location.href=this.dataset.href}"
+                        >
+                            {p.heroImage && (
+                                <figure class="relative overflow-hidden border-b border-[color:var(--color-border)]">
+                                    {p.liveUrl ? (
+                                        <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" aria-label={`Visit live site for ${p.title}`} class="group/img block">
+                                            <Image
+                                                src={p.heroImage}
+                                                alt={p.title}
+                                                width={1200}
+                                                height={630}
+                                                loading="eager"
+                                                class="w-full aspect-video object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+                                            />
+                                            <div class="absolute inset-0 bg-black/0 group-hover/img:bg-black/50 transition-all duration-300 flex items-center justify-center">
+                                                <span class="flex items-center gap-2 text-white text-sm font-semibold opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-sm px-5 py-2.5 rounded-full">
+                                                    Visit Live Site
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                                </span>
+                                            </div>
+                                        </a>
+                                    ) : (
+                                        <Image
+                                            src={p.heroImage}
+                                            alt={p.title}
+                                            width={1200}
+                                            height={630}
+                                            loading="eager"
+                                            class="w-full aspect-video object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+                                        />
+                                    )}
+                                </figure>
+                            )}
+                            <div class="p-6 flex flex-col gap-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-mono text-[0.65rem] opacity-25 tracking-widest">01</span>
+                                    <a href={href} class="text-xs font-semibold uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">
+                                        View project →
+                                    </a>
+                                </div>
+                                <h3 class="text-xl font-bold leading-snug">{p.title}</h3>
+                                {p.description && (
+                                    <p class="text-sm opacity-65 leading-relaxed line-clamp-2 md:line-clamp-none">{p.description}</p>
+                                )}
+                                {p.tags && p.tags.length > 0 && (
+                                    <div class="flex flex-wrap gap-1.5 mt-1">
+                                        {p.tags.slice(0, 6).map((tag: string) => (
+                                            <span class="text-[0.6rem] font-semibold uppercase tracking-widest border border-[color:var(--color-border)] rounded-full px-2.5 py-0.5 opacity-60">
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </article>
+                    );
+                })()}
+
+                <!-- Remaining cards — 2-column grid -->
+                {rest.length > 0 && (
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {rest.map((item, i) => {
+                            const p = pd(item);
+                            const href = projectHref(item);
+                            const num = String(i + 2).padStart(2, '0');
+                            return (
+                                <article
+                                    class="group relative rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_-8px_color-mix(in_oklab,var(--color-ink)_18%,transparent)] cursor-pointer flex flex-col"
+                                    data-href={href}
+                                    role="link"
+                                    tabindex="0"
+                                    onclick="if(!event.target.closest('a,button')){location.href=this.dataset.href}"
+                                    onkeydown="if((event.key==='Enter'||event.key===' ')&&!event.target.closest('a,button')){location.href=this.dataset.href}"
+                                >
+                                    {p.heroImage && (
+                                        <figure class="relative overflow-hidden border-b border-[color:var(--color-border)]">
+                                            {p.liveUrl ? (
+                                                <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" aria-label={`Visit live site for ${p.title}`} class="group/img block">
+                                                    <Image
+                                                        src={p.heroImage}
+                                                        alt={p.title}
+                                                        width={600}
+                                                        height={340}
+                                                        loading="lazy"
+                                                        class="w-full aspect-[16/9] object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                                                    />
+                                                    <div class="absolute inset-0 bg-black/0 group-hover/img:bg-black/50 transition-all duration-300 flex items-center justify-center">
+                                                        <span class="flex items-center gap-1.5 text-white text-xs font-semibold opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full">
+                                                            Live Site
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                                        </span>
+                                                    </div>
+                                                </a>
+                                            ) : (
+                                                <Image
+                                                    src={p.heroImage}
+                                                    alt={p.title}
+                                                    width={600}
+                                                    height={340}
+                                                    loading="lazy"
+                                                    class="w-full aspect-[16/9] object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                                                />
+                                            )}
+                                        </figure>
+                                    )}
+                                    <div class="p-4 flex flex-col gap-2 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-mono text-[0.6rem] opacity-25 tracking-widest">{num}</span>
+                                            <a href={href} class="text-[0.6rem] font-semibold uppercase tracking-widest opacity-35 hover:opacity-100 transition-opacity">
+                                                View →
+                                            </a>
+                                        </div>
+                                        <h3 class="text-sm font-bold leading-snug uppercase">{p.title}</h3>
+                                        {p.description && (
+                                            <p class="text-xs opacity-60 leading-relaxed line-clamp-2">{p.description}</p>
+                                        )}
+                                        {p.tags && p.tags.length > 0 && (
+                                            <div class="flex flex-wrap gap-1 mt-auto pt-2">
+                                                {p.tags.slice(0, 4).map((tag: string) => (
+                                                    <span class="text-[0.55rem] font-semibold uppercase tracking-widest border border-[color:var(--color-border)] rounded-full px-2 py-0.5 opacity-55">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                )}
+
             </div>
         </div>
     </div>
