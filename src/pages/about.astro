@@ -1,12 +1,19 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import { Image } from 'astro:assets';
-import photoFeatured from '../assets/photo-1.jpg';
-import photo1 from '../assets/photo-featured.jpg';
-import photo2 from '../assets/photo-2.jpg';
-import photo3 from '../assets/photo-3.jpg';
-import photo4 from '../assets/photo-4.jpg';
-import photo5 from '../assets/photo-5.jpg';
+import { getImage } from 'astro:assets';
+import rawP0 from '../assets/photo-1.jpg';
+import rawP1 from '../assets/photo-featured.jpg';
+import rawP2 from '../assets/photo-2.jpg';
+import rawP3 from '../assets/photo-3.jpg';
+import rawP4 from '../assets/photo-4.jpg';
+import rawP5 from '../assets/photo-5.jpg';
+
+const imgs = await Promise.all(
+	[rawP0, rawP1, rawP2, rawP3, rawP4, rawP5].map(src =>
+		getImage({ src, format: 'webp' })
+	)
+);
+const photoUrls = imgs.map(i => i.src);
 ---
 
 <PageLayout
@@ -54,34 +61,54 @@ import photo5 from '../assets/photo-5.jpg';
 			<div class="space-y-3 anim anim-2">
 				<div class="flex items-center justify-between mb-1">
 					<h2 class="text-base font-bold uppercase tracking-widest">Photography</h2>
-					<p class="font-mono text-xs uppercase tracking-widest opacity-40">Street · Travel · Light</p>
+					<button
+						id="shuffle-btn"
+						aria-label="Shuffle photos"
+						style="
+							display: inline-flex; align-items: center; gap: 0.4rem;
+							font-family: monospace; font-size: 0.7rem; letter-spacing: 0.2em;
+							text-transform: uppercase; font-weight: 700;
+							color: var(--color-accent); opacity: 0.75;
+							background: none; border: 1px solid color-mix(in oklab, var(--color-accent) 35%, transparent);
+							border-radius: 999px; padding: 0.3rem 0.85rem;
+							cursor: pointer; transition: opacity 0.2s, background 0.2s;
+						"
+					>
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="16 3 21 3 21 8"/>
+							<line x1="4" y1="20" x2="21" y2="3"/>
+							<polyline points="21 16 21 21 16 21"/>
+							<line x1="15" y1="15" x2="21" y2="21"/>
+						</svg>
+						Shuffle
+					</button>
 				</div>
 
 				<!-- Featured wide -->
 				<div class="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
-					<Image src={photoFeatured} alt="Featured photo" class="w-full h-full object-cover" />
+					<img id="photo-0" src={photoUrls[0]} alt="Featured photo" class="w-full h-full object-cover" style="transition: opacity 0.35s ease;" />
 				</div>
 
 				<!-- 2-col row -->
 				<div class="grid grid-cols-2 gap-3">
 					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
-						<Image src={photo1} alt="Photo" class="w-full h-full object-cover" />
+						<img id="photo-1" src={photoUrls[1]} alt="Photo" class="w-full h-full object-cover" style="transition: opacity 0.35s ease;" />
 					</div>
 					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
-						<Image src={photo2} alt="Photo" class="w-full h-full object-cover" />
+						<img id="photo-2" src={photoUrls[2]} alt="Photo" class="w-full h-full object-cover" style="transition: opacity 0.35s ease;" />
 					</div>
 				</div>
 
 				<!-- 3-col row -->
 				<div class="grid grid-cols-3 gap-3">
 					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
-						<Image src={photo3} alt="Photo" class="w-full h-full object-cover" />
+						<img id="photo-3" src={photoUrls[3]} alt="Photo" class="w-full h-full object-cover" style="transition: opacity 0.35s ease;" />
 					</div>
 					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
-						<Image src={photo4} alt="Photo" class="w-full h-full object-cover" />
+						<img id="photo-4" src={photoUrls[4]} alt="Photo" class="w-full h-full object-cover" style="transition: opacity 0.35s ease;" />
 					</div>
 					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
-						<Image src={photo5} alt="Photo" class="w-full h-full object-cover" />
+						<img id="photo-5" src={photoUrls[5]} alt="Photo" class="w-full h-full object-cover" style="transition: opacity 0.35s ease;" />
 					</div>
 				</div>
 
@@ -91,3 +118,37 @@ import photo5 from '../assets/photo-5.jpg';
 
 	</section>
 </PageLayout>
+
+<script define:vars={{ photoUrls }}>
+(function () {
+	const btn = document.getElementById('shuffle-btn');
+	const slots = [0, 1, 2, 3, 4, 5].map(i => document.getElementById('photo-' + i));
+	let pool = [...photoUrls];
+
+	function shuffle(arr) {
+		const a = [...arr];
+		for (let i = a.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[a[i], a[j]] = [a[j], a[i]];
+		}
+		// keep shuffling until at least one slot changes
+		return a;
+	}
+
+	btn.addEventListener('mouseenter', () => { btn.style.opacity = '1'; btn.style.background = 'color-mix(in oklab, var(--color-accent) 10%, transparent)'; });
+	btn.addEventListener('mouseleave', () => { btn.style.opacity = '0.75'; btn.style.background = 'none'; });
+
+	btn.addEventListener('click', () => {
+		let next;
+		do { next = shuffle(pool); } while (next.every((v, i) => v === pool[i]));
+		pool = next;
+
+		// fade out → swap src → fade in
+		slots.forEach(el => { el.style.opacity = '0'; });
+		setTimeout(() => {
+			slots.forEach((el, i) => { el.src = pool[i]; });
+			slots.forEach(el => { el.style.opacity = '1'; });
+		}, 350);
+	});
+})();
+</script>
