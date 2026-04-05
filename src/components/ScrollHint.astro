@@ -67,46 +67,36 @@
     const label = document.getElementById('scroll-hint-label');
     if (!hint || !label) return;
 
-    // Collect all <section> elements inside <main>
-    const sections = Array.from(document.querySelectorAll('main section'));
-
-    // Build labels: for each section, find its heading text.
-    // The hero has no h2, so we label it by the NEXT section's h2.
-    const sectionLabels: string[] = sections.map((sec) => {
-      const h = sec.querySelector('h2');
-      return h ? h.textContent?.trim() ?? '' : '';
-    });
+    // Use every h2 inside main as a scroll target — one per section heading
+    const headings: Element[] = Array.from(document.querySelectorAll('main h2'));
 
     let currentLabel = '';
-    let nextSection: Element | null = null;
+    let nextHeading: Element | null = null;
 
     function update() {
-      const midY = window.innerHeight * 0.5;
+      const headerH = (document.querySelector('.site-header') as HTMLElement)?.offsetHeight ?? 68;
+      const triggerY = headerH + 32; // just below the header
 
-      // Find the last section whose top edge is above mid-screen
-      let activeIdx = 0;
-      for (let i = 0; i < sections.length; i++) {
-        if (sections[i].getBoundingClientRect().top < midY) {
+      // Find the last heading that has scrolled past the trigger line
+      let activeIdx = -1;
+      for (let i = 0; i < headings.length; i++) {
+        if (headings[i].getBoundingClientRect().top < triggerY) {
           activeIdx = i;
         }
       }
 
       const nextIdx = activeIdx + 1;
 
-      if (nextIdx >= sections.length) {
+      if (nextIdx >= headings.length) {
         hint.style.opacity = '0';
-        nextSection = null;
+        nextHeading = null;
         return;
       }
 
       hint.style.opacity = '1';
-      nextSection = sections[nextIdx];
+      nextHeading = headings[nextIdx];
 
-      // Find the first non-empty label from nextIdx onwards
-      let nextLabel = '';
-      for (let i = nextIdx; i < sections.length; i++) {
-        if (sectionLabels[i]) { nextLabel = sectionLabels[i]; break; }
-      }
+      const nextLabel = nextHeading.textContent?.trim() ?? '';
 
       if (!nextLabel) {
         hint.style.opacity = '0';
@@ -123,14 +113,15 @@
       }
     }
 
-    // Click scrolls to next section
+    // Click scrolls exactly to the next heading minus header offset
     hint.addEventListener('click', () => {
-      if (nextSection) {
-        nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (nextHeading) {
+        const headerH = (document.querySelector('.site-header') as HTMLElement)?.offsetHeight ?? 68;
+        const top = nextHeading.getBoundingClientRect().top + window.scrollY - headerH - 16;
+        window.scrollTo({ top, behavior: 'smooth' });
       }
     });
 
-    // Init
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update, { passive: true });

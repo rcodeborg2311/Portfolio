@@ -1,21 +1,4 @@
 ---
-/**
- * SectionList.astro
- *
- * Reusable section component for lists like "Education", "Teaching", "Speaking", etc.
- *
- * Props:
- *  - heading: string
- *  - items: Array<{
- *      title: string;
- *      description?: string;
- *      datetime?: string; // value for the `datetime` attribute on <time>
- *      dateLabel?: string; // what to render inside <time>, defaults to `datetime`
- *    }>
- *
- * Slots:
- *  - default: (optional) any extra content to render after the items (e.g. "View all" link)
- */
 interface Item {
     title: string;
     description?: string;
@@ -38,75 +21,78 @@ const items: Item[] = Astro.props.items ?? [];
 function isExternal(href: string) {
     return /^https?:\/\//i.test(href);
 }
+
+const isSkills = heading.toLowerCase().includes('skill');
 ---
 
 <section>
-    <div class="max-w-[90rem] mx-auto px-8">
-        <div
-            class="grid grid-cols-1 gap-4 md:grid-cols-3 border-b py-8 border-base-200"
-        >
-            <div class="lg:sticky lg:top-24 lg:z-40 self-start">
-                <h2
-                    class="text-base text-base-900 font-bold uppercase"
-                >
-                    {heading}
-                </h2>
-            </div>
+  <div class="max-w-[90rem] mx-auto px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 border-b border-[color:var(--color-border)] py-16 gap-y-10">
 
-            <div class="flex flex-col gap-12 lg:col-span-2">
-                {
-                    items.map((item) => (
-                        <article class="group relative grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
-                            <div class="lg:col-span-2">
-                                <h3 class="text-base text-base-900 font-bold uppercase">
-                                    {item.href ? (
-                                        <a
-                                            href={item.href}
-                                            target={
-                                                item.target ??
-                                                ((item.external ??
-                                                isExternal(item.href))
-                                                    ? "_blank"
-                                                    : undefined)
-                                            }
-                                            rel={
-                                                item.rel ??
-                                                ((item.external ??
-                                                isExternal(item.href))
-                                                    ? "noopener noreferrer"
-                                                    : undefined)
-                                            }
-                                        >
-                                            <span class="absolute -inset-x-4 -inset-y-6 z-20 sm:-inset-x-6 sm:rounded-2xl" />
-                                            <span class="relative z-10">
-                                                {item.title}
-                                            </span>
-                                        </a>
-                                    ) : (
-                                        item.title
-                                    )}
-                                </h3>
-                                {item.description && (
-                                    <p class="mt-1 text-base-600">
-                                        {item.description}
-                                    </p>
-                                )}
-                            </div>
+      <!-- Sticky label -->
+      <div class="lg:sticky lg:top-24 lg:z-40 self-start">
+        <h2 class="text-base font-bold uppercase tracking-widest">{heading}</h2>
+      </div>
 
-                            {item.datetime && (
-                                <p class="text-xs text-base-600 lg:ml-auto">
-                                    <time datetime={item.datetime}>
-                                        {item.dateLabel ?? item.datetime}
-                                    </time>
-                                </p>
-                            )}
-                        </article>
-                    ))
-                }
+      <!-- Content -->
+      <div class="md:col-span-2">
 
-                <!-- Slot for optional extra content, e.g. "View all" link -->
-                <slot />
-            </div>
-        </div>
+        {isSkills ? (
+          /* ── Skills: clean pill groups ── */
+          <div class="flex flex-col gap-6">
+            {items.map((item) => (
+              <div class="flex flex-col gap-2">
+                <p class="font-mono text-xs uppercase tracking-widest opacity-45">{item.title}</p>
+                <div class="flex flex-wrap gap-2">
+                  {(item.description || '').split(',').map((s: string) => s.trim()).filter(Boolean).map((skill: string) => (
+                    <span class="px-3 py-1 rounded-full border border-[color:var(--color-border)] text-xs font-semibold tracking-wide opacity-80 hover:opacity-100 hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent)] transition-all duration-150">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* ── Experience / Education: timeline ── */
+          <div class="relative flex flex-col gap-10 pl-6 border-l border-[color:var(--color-border)]">
+            {items.map((item) => (
+              <div class="relative group">
+                {/* Timeline dot */}
+                <span class="absolute -left-[1.4rem] top-[0.45rem] h-2.5 w-2.5 rounded-full border-2 border-[color:var(--color-accent)] bg-[color:var(--color-paper)] group-hover:bg-[color:var(--color-accent)] transition-colors duration-200"></span>
+
+                <div class="flex flex-col gap-1.5">
+                  {/* Date */}
+                  {item.datetime && (
+                    <p class="font-mono text-xs uppercase tracking-widest opacity-40">{item.dateLabel ?? item.datetime}</p>
+                  )}
+
+                  {/* Title */}
+                  <h3 class="font-bold leading-snug">
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        target={item.target ?? ((item.external ?? isExternal(item.href)) ? '_blank' : undefined)}
+                        rel={item.rel ?? ((item.external ?? isExternal(item.href)) ? 'noopener noreferrer' : undefined)}
+                        class="hover:text-[color:var(--color-accent)] transition-colors duration-150"
+                      >
+                        {item.title}
+                      </a>
+                    ) : item.title}
+                  </h3>
+
+                  {/* Description — trimmed */}
+                  {item.description && (
+                    <p class="text-sm opacity-60 leading-relaxed">{item.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <slot />
+      </div>
     </div>
+  </div>
 </section>
