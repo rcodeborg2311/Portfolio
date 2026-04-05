@@ -35,122 +35,121 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
       overflow: hidden;
     ">
       <svg
-        viewBox="0 0 1400 500"
+        viewBox="0 0 1400 480"
         preserveAspectRatio="xMidYMax meet"
         xmlns="http://www.w3.org/2000/svg"
         class="skyline-svg"
         style="position:absolute;bottom:0;left:0;width:100%;height:100%;"
       >
         <defs>
-          <linearGradient id="skyFade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="currentColor" stop-opacity="0"/>
-            <stop offset="40%"  stop-color="currentColor" stop-opacity="0.3"/>
-            <stop offset="100%" stop-color="currentColor" stop-opacity="1"/>
+          <!-- vertical fade: transparent at top, solid at bottom -->
+          <linearGradient id="skyFadeV" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+            <stop offset="38%"  stop-color="white" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="white" stop-opacity="1"/>
           </linearGradient>
-          <mask id="skyMask">
-            <rect width="1400" height="500" fill="url(#skyFade)"/>
-          </mask>
+          <!-- horizontal fade: transparent far-left, solid by 30% -->
+          <linearGradient id="skyFadeH" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+            <stop offset="22%"  stop-color="white" stop-opacity="1"/>
+            <stop offset="100%" stop-color="white" stop-opacity="1"/>
+          </linearGradient>
+          <mask id="skyMaskV"><rect width="1400" height="480" fill="url(#skyFadeV)"/></mask>
+          <mask id="skyMaskH"><rect width="1400" height="480" fill="url(#skyFadeH)"/></mask>
         </defs>
 
         <!--
-          Wall Street / Lower Manhattan skyline — pure rectilinear building shapes.
-          Ground = y=500. Landmarks L→R:
-          general cluster → 4WTC → 3WTC → Freedom Tower (spire) → 70 Pine (Art Deco crown) → 40 Wall (pyramid) → trailing right
+          Lower Manhattan / Wall Street skyline.
+          Clean rectilinear towers. Ground = y=480.
+          Landmarks L→R: cluster → 4WTC → 3WTC → 1WTC Freedom Tower (spire)
+                          → 70 Pine (Art Deco stepped crown) → 40 Wall (pyramid) → east cluster
         -->
-        <path
-          mask="url(#skyMask)"
-          fill="currentColor"
-          d="
-            M 0,500
-            L 0,415    L 36,415
-            L 36,428   L 58,428
-            L 58,392   L 94,392
-            L 94,405   L 114,405
-            L 114,372
-            L 120,372  L 120,358  L 124,358
-            L 124,348  L 128,348
-            L 128,358  L 132,358  L 132,372
-            L 158,372
-            L 158,382  L 178,382
-            L 178,348  L 218,348
-            L 218,360  L 240,360
-            L 240,322  L 282,322
-            L 282,336  L 304,336
-            L 304,298  L 348,298
-            L 348,312  L 368,312
-            L 368,272  L 412,272
-            L 412,285  L 430,285
-            L 430,250  L 474,250
-            L 474,262  L 490,262
-            L 490,232  L 534,232
+        <g mask="url(#skyMaskV)">
+          <g mask="url(#skyMaskH)">
+            <path fill="currentColor" d="
+              M 0,480
 
-            L 534,242  L 548,242
-            L 548,165
-            L 554,165  L 554,135
-            L 558,135  L 558,104
-            L 562,104  L 562,78
-            L 565,78   L 565,54
-            L 567,54   L 567,34
-            L 569,34   L 569,16
-            L 571,16   L 571,6
-            L 573,6
-            L 573,16   L 575,16
-            L 575,34   L 577,34
-            L 577,54   L 579,54
-            L 579,78   L 582,78
-            L 582,104  L 586,104
-            L 586,135  L 590,135
-            L 590,165  L 596,165
-            L 596,238
+              L 0,402    L 52,402
+              L 52,418   L 82,418
+              L 82,382   L 138,382
+              L 138,396  L 165,396
+              L 165,358  L 225,358
+              L 225,374  L 252,374
+              L 252,334  L 316,334
+              L 316,350  L 344,350
+              L 344,308  L 412,308
+              L 412,324  L 440,324
+              L 440,282  L 510,282
+              L 510,296  L 535,296
 
-            L 618,238
-            L 618,215  L 648,215
-            L 648,228  L 668,228
+              L 535,258  L 590,258
+              L 590,272  L 610,272
 
-            L 668,185
-            L 676,185  L 676,158
-            L 681,158  L 681,133
-            L 685,133  L 685,112
-            L 688,112  L 688,96
-            L 690,96   L 690,82
-            L 692,82   L 692,70
-            L 694,70
-            L 694,82   L 696,82
-            L 696,96   L 698,96
-            L 698,112  L 701,112
-            L 701,133  L 705,133
-            L 705,158  L 710,158
-            L 710,185  L 716,185
-            L 716,205  L 730,205
+              L 610,238  L 668,238
+              L 668,252  L 688,252
 
-            L 730,192
-            L 738,192  L 738,170
-            L 746,170
-            L 750,160  L 754,150  L 757,142  L 760,136
-            L 763,142  L 766,150  L 770,160
-            L 774,170
-            L 782,170  L 782,192
-            L 790,192  L 790,212
-            L 808,212
+              L 688,190  L 700,190
+              L 700,160  L 706,160
+              L 706,128  L 710,128
+              L 710,96   L 713,96
+              L 713,70   L 715,70
+              L 715,48   L 717,48
+              L 717,28   L 719,28
+              L 719,12   L 721,12
+              L 721,4
+              L 723,4
+              L 723,12   L 725,12
+              L 725,28   L 727,28
+              L 727,48   L 729,48
+              L 729,70   L 731,70
+              L 731,96   L 734,96
+              L 734,128  L 738,128
+              L 738,160  L 744,160
+              L 744,190  L 756,190
+              L 756,258
 
-            L 808,196  L 850,196
-            L 850,212  L 872,212
-            L 872,230  L 900,230
-            L 900,215  L 932,215
-            L 932,235  L 965,235
-            L 965,252  L 1000,252
-            L 1000,238 L 1038,238
-            L 1038,256 L 1078,256
-            L 1078,274 L 1120,274
-            L 1120,258 L 1165,258
-            L 1165,278 L 1215,278
-            L 1215,294 L 1270,294
-            L 1270,278 L 1330,278
-            L 1330,296 L 1400,296
-            L 1400,500
-            Z
-          "
-        />
+              L 778,258
+              L 778,236  L 838,236
+              L 838,250  L 860,250
+
+              L 860,194  L 870,194
+              L 870,168  L 875,168
+              L 875,146  L 879,146
+              L 879,126  L 882,126
+              L 882,108  L 885,108
+              L 885,92   L 887,92
+              L 887,78   L 889,78
+              L 889,66   L 891,66
+              L 891,78   L 893,78
+              L 893,92   L 895,92
+              L 895,108  L 898,108
+              L 898,126  L 901,126
+              L 901,146  L 905,146
+              L 905,168  L 910,168
+              L 910,194  L 920,194
+              L 920,215  L 940,215
+
+              L 940,200  L 950,200
+              L 950,176  L 958,176
+              L 958,164
+              L 963,154  L 968,144  L 972,136  L 975,130
+              L 978,136  L 981,144  L 985,154  L 990,164
+              L 990,176  L 998,176
+              L 998,200  L 1008,200
+              L 1008,222 L 1030,222
+
+              L 1030,205 L 1080,205
+              L 1080,222 L 1110,222
+              L 1110,242 L 1162,242
+              L 1162,226 L 1218,226
+              L 1218,246 L 1278,246
+              L 1278,265 L 1345,265
+              L 1345,248 L 1400,248
+              L 1400,480
+              Z
+            "/>
+          </g>
+        </g>
       </svg>
     </div>
     <h1
