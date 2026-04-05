@@ -34,23 +34,27 @@ const { title = site.author.name, description, image } = Astro.props;
             <!-- Animated grid background -->
             <canvas id="splash-canvas" style="position:absolute;inset:0;opacity:0.18;"></canvas>
 
-            <!-- Monogram -->
+            <!-- Top-left brand mark -->
+            <div style="position:absolute; top:1.5rem; left:2rem; z-index:2; font-family:monospace; font-size:0.85rem; font-weight:700; letter-spacing:0.28em; text-transform:uppercase; color:#4d9eff; opacity:0.6;">RP</div>
+
+            <!-- Center content -->
             <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
                 <div id="splash-rp" style="
                     font-family: monospace;
-                    font-size: clamp(3.5rem, 10vw, 7rem);
-                    font-weight: 800;
-                    letter-spacing: 0.15em;
-                    color: #4d9eff;
+                    font-size: clamp(1.1rem, 3vw, 1.5rem);
+                    font-weight: 400;
+                    letter-spacing: 0.45em;
+                    text-transform: uppercase;
+                    color: #edf2ff;
                     opacity: 0;
-                    transform: translateY(12px);
-                    transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
-                ">RP</div>
+                    transform: translateY(10px);
+                    transition: opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s;
+                ">Welcome</div>
 
                 <!-- Ticker tape -->
                 <div id="splash-ticker" style="
                     font-family: monospace;
-                    font-size: 0.7rem;
+                    font-size: 0.65rem;
                     letter-spacing: 0.22em;
                     text-transform: uppercase;
                     color: #4d9eff;
