@@ -2,10 +2,10 @@ author:
   name: "Ridham Patel"
   role: "BS CS @ ASU · Graduating May 2026"
   bio: >
-    I'm a CS student at Arizona State University interested in quantitative finance,
-    low-latency systems, and how markets work under the hood.
-    I build things to learn — market microstructure tools, trading simulations,
-    and anything that sits at the intersection of math and systems programming.
+    CS undergraduate at Arizona State University, graduating May 2026.
+    I spend most of my time studying how markets work and building the systems that interact with them.
+    My work sits at the intersection of quantitative research and low-latency engineering,
+    from reinforcement learning agents and stochastic models to lock-free order books and microstructure signal platforms.
   location: "Phoenix, AZ"
 
 social:
