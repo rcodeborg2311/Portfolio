@@ -1,12 +1,11 @@
 author:
   name: "Ridham Patel"
-  role: "Quant Developer Candidate · BS CS @ ASU"
+  role: "BS CS @ ASU · Graduating May 2026"
   bio: >
-    BS CS at Arizona State University (graduating May 2026), GPA 3.89, Dean's List.
-    I build low-latency systems and quantitative research tools targeting
-    Quant Developer and Quant Researcher roles at top trading firms.
-    Interests: high-frequency trading infrastructure, statistical arbitrage,
-    and reinforcement learning for market microstructure.
+    I'm a CS student at Arizona State University interested in quantitative finance,
+    low-latency systems, and how markets work under the hood.
+    I build things to learn — market microstructure tools, trading simulations,
+    and anything that sits at the intersection of math and systems programming.
   location: "Phoenix, AZ"
 
 social:
