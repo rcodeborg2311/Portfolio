@@ -1,5 +1,12 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import { Image } from 'astro:assets';
+import photoFeatured from '../assets/photo-featured.jpg';
+import photo1 from '../assets/photo-1.jpg';
+import photo2 from '../assets/photo-2.jpg';
+import photo3 from '../assets/photo-3.jpg';
+import photo4 from '../assets/photo-4.jpg';
+import photo5 from '../assets/photo-5.jpg';
 ---
 
 <PageLayout
@@ -51,30 +58,30 @@ import PageLayout from '../layouts/PageLayout.astro';
 				</div>
 
 				<!-- Featured wide -->
-				<div class="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-					<p class="font-mono text-xs uppercase tracking-widest opacity-25">Featured photo</p>
+				<div class="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
+					<Image src={photoFeatured} alt="Featured photo" class="w-full h-full object-cover" />
 				</div>
 
 				<!-- 2-col row -->
 				<div class="grid grid-cols-2 gap-3">
-					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
+						<Image src={photo1} alt="Photo" class="w-full h-full object-cover" />
 					</div>
-					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-xs uppercase tracking-widest opacity-25">Photo</p>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
+						<Image src={photo2} alt="Photo" class="w-full h-full object-cover" />
 					</div>
 				</div>
 
 				<!-- 3-col row -->
 				<div class="grid grid-cols-3 gap-3">
-					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-[0.55rem] uppercase tracking-widest opacity-25">Photo</p>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
+						<Image src={photo3} alt="Photo" class="w-full h-full object-cover" />
 					</div>
-					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-[0.55rem] uppercase tracking-widest opacity-25">Photo</p>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
+						<Image src={photo4} alt="Photo" class="w-full h-full object-cover" />
 					</div>
-					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center">
-						<p class="font-mono text-[0.55rem] uppercase tracking-widest opacity-25">Photo</p>
+					<div class="aspect-square rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
+						<Image src={photo5} alt="Photo" class="w-full h-full object-cover" />
 					</div>
 				</div>
 
