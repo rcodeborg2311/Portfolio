@@ -2,16 +2,16 @@
 import PageLayout from '../layouts/PageLayout.astro';
 ---
 
-<PageLayout title="Commit History | Ridham Patel" description="Recent commits to this portfolio repository.">
+<PageLayout title="Commit History | Ridham Patel" description="Contribution activity across all repositories.">
   <section class="max-w-[90rem] mx-auto px-8 py-16">
 
     <!-- Header -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-10 border-b border-[color:var(--color-border)]">
       <div class="flex flex-col gap-4">
-        <p class="eyebrow">Portfolio Repo</p>
-        <h1 class="text-2xl font-bold uppercase tracking-widest leading-tight">Commit<br/>History</h1>
+        <p class="eyebrow">All Repositories</p>
+        <h1 class="text-2xl font-bold uppercase tracking-widest leading-tight">Contribution<br/>Activity</h1>
         <a
-          href="https://github.com/rcodeborg2311/Portfolio"
+          href="https://github.com/rcodeborg2311"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest opacity-60 hover:opacity-100 hover:text-[color:var(--color-accent)] transition-all duration-200"
@@ -24,7 +24,7 @@ import PageLayout from '../layouts/PageLayout.astro';
       </div>
       <div class="md:col-span-2 flex items-start">
         <p class="text-base opacity-70 leading-relaxed max-w-lg">
-          Contribution heatmap for the last 30 days — fetched live from GitHub.
+          Contribution heatmap across all repos for the last 30 days — live from GitHub.
         </p>
       </div>
     </div>
@@ -40,14 +40,13 @@ import PageLayout from '../layouts/PageLayout.astro';
         </div>
       </div>
 
-      <!-- Grid container — JS sets column count, cells fill row-by-row -->
       <div id="heatmap-wrap" class="w-full">
         <div id="heatmap" class="grid gap-[5px]" style="grid-template-rows: repeat(7, 1fr);">
-          <!-- filled by JS -->
         </div>
       </div>
 
       <p id="heatmap-loading" class="font-mono text-xs uppercase tracking-widest opacity-40 mt-6">Loading…</p>
+      <p id="heatmap-error" class="font-mono text-xs uppercase tracking-widest opacity-40 mt-6 hidden">Could not load contribution data.</p>
       <p id="heatmap-total" class="mt-5 font-mono text-sm tracking-widest opacity-60 hidden"></p>
     </div>
 
@@ -71,66 +70,73 @@ import PageLayout from '../layouts/PageLayout.astro';
 
 <script is:inline>
 (async function () {
-  const REPO    = 'rcodeborg2311/Portfolio';
-  const API     = 'https://api.github.com/repos/' + REPO;
-  const HEADERS = { Accept: 'application/vnd.github+json' };
+  const heatmap  = document.getElementById('heatmap');
+  const loading  = document.getElementById('heatmap-loading');
+  const errorEl  = document.getElementById('heatmap-error');
+  const totalEl  = document.getElementById('heatmap-total');
+  const legend   = document.getElementById('legend');
 
-  // ── Dates ────────────────────────────────────────────────────
-  const now   = new Date();
-  const since = new Date(now);
-  since.setDate(since.getDate() - 29);
-
-  const days = [];
-  for (let d = new Date(since); d <= now; d.setDate(d.getDate() + 1)) {
-    days.push(d.toISOString().slice(0, 10));
-  }
-
-  // ── Fetch commits ────────────────────────────────────────────
-  let allCommits = [];
-  try {
-    const res = await fetch(
-      API + '/commits?since=' + since.toISOString() + '&per_page=100',
-      { headers: HEADERS }
-    );
-    if (res.ok) allCommits = await res.json();
-  } catch (_) {}
-
-  const counts = {};
-  days.forEach(function(d) { counts[d] = 0; });
-  allCommits.forEach(function(c) {
-    const day = (c.commit.author.date || '').slice(0, 10);
-    if (counts[day] !== undefined) counts[day]++;
-  });
-
-  const maxCount = Math.max(1, ...Object.values(counts));
-
-  // ── Draw legend ──────────────────────────────────────────────
-  const legend = document.getElementById('legend');
+  // ── Legend ───────────────────────────────────────────────────
   [0, 1, 2, 3, 4].forEach(function(level) {
     const sq = document.createElement('span');
-    sq.style.display = 'inline-block';
-    sq.style.width = '14px';
-    sq.style.height = '14px';
+    sq.style.display      = 'inline-block';
+    sq.style.width        = '14px';
+    sq.style.height       = '14px';
     sq.style.borderRadius = '3px';
-    sq.style.background = 'var(--color-accent)';
-    sq.style.opacity = level === 0 ? '0.08' : (0.2 + level * 0.2).toFixed(2);
+    sq.style.background   = 'var(--color-accent)';
+    sq.style.opacity      = level === 0 ? '0.08' : (0.2 + level * 0.2).toFixed(2);
     legend.appendChild(sq);
   });
 
-  // ── Size cells to fill 75% width ─────────────────────────────
-  const firstRow  = (new Date(days[0]).getDay() + 6) % 7; // Mon=0
-  const cols      = Math.ceil((firstRow + days.length) / 7);
-  const heatmap   = document.getElementById('heatmap');
-  const wrap      = document.getElementById('heatmap-wrap');
+  // ── Fetch from proxy ─────────────────────────────────────────
+  let days = [];
+  let counts = {};
+  let total = 0;
 
-  // Cell size: fill the container width with `cols` cells + gaps
+  try {
+    const res  = await fetch('/api/contributions');
+    if (!res.ok) throw new Error();
+    const json = await res.json();
+
+    const cal = json.data.user.contributionsCollection.contributionCalendar;
+    total = cal.totalContributions;
+
+    // Flatten all days from the last 30 days only
+    const now   = new Date();
+    const since = new Date(now);
+    since.setDate(since.getDate() - 29);
+    since.setHours(0, 0, 0, 0);
+
+    cal.weeks.forEach(function(week) {
+      week.contributionDays.forEach(function(day) {
+        const d = new Date(day.date);
+        if (d >= since && d <= now) {
+          days.push(day.date);
+          counts[day.date] = day.contributionCount;
+        }
+      });
+    });
+
+    // Sort chronologically
+    days.sort();
+
+  } catch (_) {
+    loading.classList.add('hidden');
+    errorEl.classList.remove('hidden');
+    return;
+  }
+
+  // ── Build grid ───────────────────────────────────────────────
+  const maxCount = Math.max(1, ...Object.values(counts));
+  const firstRow = (new Date(days[0]).getDay() + 6) % 7; // Mon=0
+  const cols     = Math.ceil((firstRow + days.length) / 7);
   const gapPx    = 5;
-  const cellSize = 'calc((100% - ' + (cols - 1) * gapPx + 'px) / ' + cols + ')';
+  const cellSize = 'calc((100% - ' + ((cols - 1) * gapPx) + 'px) / ' + cols + ')';
 
   heatmap.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellSize + ')';
   heatmap.style.gridTemplateRows    = 'repeat(7, ' + cellSize + ')';
 
-  // ── Fill leading empty cells ─────────────────────────────────
+  // Leading empty cells
   for (let i = 0; i < firstRow; i++) {
     const empty = document.createElement('div');
     empty.className = 'heat-cell';
@@ -138,11 +144,11 @@ import PageLayout from '../layouts/PageLayout.astro';
     heatmap.appendChild(empty);
   }
 
-  // ── Fill day cells ───────────────────────────────────────────
+  // Day cells
   days.forEach(function(day) {
     const count = counts[day] || 0;
     const cell  = document.createElement('div');
-    cell.className = 'heat-cell';
+    cell.className       = 'heat-cell';
     cell.style.background = 'var(--color-accent)';
 
     if (count === 0) {
@@ -156,17 +162,14 @@ import PageLayout from '../layouts/PageLayout.astro';
     }
 
     cell.title = count === 0
-      ? 'No commits on ' + day
-      : count + ' commit' + (count > 1 ? 's' : '') + ' on ' + day;
+      ? 'No contributions on ' + day
+      : count + ' contribution' + (count > 1 ? 's' : '') + ' on ' + day;
 
     heatmap.appendChild(cell);
   });
 
-  // ── Finish ───────────────────────────────────────────────────
-  document.getElementById('heatmap-loading').remove();
-  const sum = Object.values(counts).reduce(function(a, b) { return a + b; }, 0);
-  const totalEl = document.getElementById('heatmap-total');
-  totalEl.textContent = sum + ' commits in the last 30 days';
+  loading.remove();
+  totalEl.textContent = total + ' contributions in the last 30 days';
   totalEl.classList.remove('hidden');
 })();
 </script>
