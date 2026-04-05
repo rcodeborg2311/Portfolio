@@ -79,6 +79,13 @@ const { title = site.author.name, description, image } = Astro.props;
 
         <script is:inline>
         (function() {
+            // Only show splash on first visit per session
+            if (sessionStorage.getItem('visited')) {
+                document.getElementById('splash').style.display = 'none';
+                return;
+            }
+            sessionStorage.setItem('visited', '1');
+
             // ── Animated dot grid on canvas ──
             const canvas = document.getElementById('splash-canvas');
             const ctx    = canvas.getContext('2d');
