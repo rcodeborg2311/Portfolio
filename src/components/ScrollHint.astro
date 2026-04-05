@@ -1,0 +1,129 @@
+---
+// No props — reads section headings from the DOM at runtime via JS
+---
+
+<div
+  id="scroll-hint"
+  aria-hidden="true"
+  style="
+    position: fixed;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 400ms ease;
+  "
+>
+  <span
+    id="scroll-hint-label"
+    style="
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--color-ink);
+      opacity: 0.45;
+      transition: opacity 300ms ease;
+    "
+  ></span>
+
+  <svg
+    id="scroll-hint-arrow"
+    width="10"
+    height="16"
+    viewBox="0 0 10 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    style="opacity: 0.35; animation: sh-bounce 1.6s ease-in-out infinite;"
+  >
+    <line x1="5" y1="0" x2="5" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <polyline points="1,9 5,14 9,9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+</div>
+
+<style>
+  @keyframes sh-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(4px); }
+  }
+
+  @media (max-width: 640px) {
+    #scroll-hint { display: none; }
+  }
+</style>
+
+<script>
+  (function () {
+    const hint  = document.getElementById('scroll-hint');
+    const label = document.getElementById('scroll-hint-label');
+    if (!hint || !label) return;
+
+    // Collect all <section> elements inside <main>
+    const sections = Array.from(document.querySelectorAll('main section'));
+
+    // Build labels: for each section, find its heading text.
+    // The hero has no h2, so we label it by the NEXT section's h2.
+    const sectionLabels: string[] = sections.map((sec) => {
+      const h = sec.querySelector('h2');
+      return h ? h.textContent?.trim() ?? '' : '';
+    });
+
+    let currentLabel = '';
+
+    function update() {
+      const midY = window.innerHeight * 0.5;
+
+      // Find the last section whose top edge is above mid-screen
+      let activeIdx = 0;
+      for (let i = 0; i < sections.length; i++) {
+        if (sections[i].getBoundingClientRect().top < midY) {
+          activeIdx = i;
+        }
+      }
+
+      const nextIdx = activeIdx + 1;
+
+      if (nextIdx >= sections.length) {
+        // Past last section — fade out
+        hint.style.opacity = '0';
+        return;
+      }
+
+      hint.style.opacity = '1';
+
+      // Find the first non-empty label from nextIdx onwards
+      let nextLabel = '';
+      for (let i = nextIdx; i < sections.length; i++) {
+        if (sectionLabels[i]) { nextLabel = sectionLabels[i]; break; }
+      }
+
+      if (!nextLabel) {
+        hint.style.opacity = '0';
+        return;
+      }
+
+      if (nextLabel !== currentLabel) {
+        // Brief fade-through on change
+        label.style.opacity = '0';
+        setTimeout(() => {
+          label.textContent = nextLabel;
+          label.style.opacity = '0.45';
+        }, 150);
+        currentLabel = nextLabel;
+      }
+    }
+
+    // Init
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+  })();
+</script>

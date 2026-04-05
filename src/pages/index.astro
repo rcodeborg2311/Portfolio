@@ -7,6 +7,7 @@ import { getCollection } from "astro:content";
 import { getSite } from '../utils/consts';
 import ProjectList from '../components/ProjectList.astro';
 import Social from '../components/Social.astro';
+import ScrollHint from '../components/ScrollHint.astro';
 
 const cv = (await getCollection("cv" as any)) as any[];
 
@@ -17,6 +18,7 @@ const site = await getSite();
 	title={`${site.author.name || 'Ridham Patel'} | CS @ ASU`}
 	description="CS student at ASU interested in quantitative finance and low-latency systems."
 >
+	<ScrollHint />
 	<Hero
 		title={site.author.name || 'Ridham Patel'}
 		description={site.author.bio || 'Welcome to my personal website.'}
