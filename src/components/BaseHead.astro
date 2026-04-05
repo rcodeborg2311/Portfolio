@@ -21,6 +21,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const imageURL = new URL((image as ImageMetadata).src, Astro.site ?? Astro.url);
 ---
 
+<script is:inline>
+  (function () {
+    var stored = localStorage.getItem('theme');
+    document.documentElement.dataset.theme =
+      stored === 'light' || stored === 'dark' ? stored : 'dark';
+  })();
+</script>
 <SEO
 	charset="utf-8"
 	title={title}
