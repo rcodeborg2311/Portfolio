@@ -24,18 +24,18 @@ import PageLayout from '../layouts/PageLayout.astro';
       </div>
       <div class="md:col-span-2 flex items-start">
         <p class="text-base opacity-70 leading-relaxed max-w-lg">
-          Last 30 days across all repos. <span class="opacity-50">Click the graph to play Snake on it.</span>
+          Last 16 weeks across all repos. <span class="opacity-50">Click the graph to play Snake on it.</span>
         </p>
       </div>
     </div>
 
-    <!-- ── Heatmap + Snake overlay ── -->
-    <div class="mt-12">
+    <!-- ── Graph area ── -->
+    <div class="mt-12 w-full">
 
-      <!-- Legend + total -->
-      <div class="flex items-center justify-between mb-4">
-        <p id="heatmap-total" class="font-mono text-sm tracking-widest opacity-55 hidden"></p>
+      <!-- Top bar -->
+      <div class="flex items-center justify-between mb-3">
         <p id="heatmap-loading" class="font-mono text-xs uppercase tracking-widest opacity-40">Loading…</p>
+        <p id="heatmap-total"   class="font-mono text-sm tracking-widest opacity-55 hidden"></p>
         <div class="flex items-center gap-2 ml-auto">
           <span class="font-mono text-[0.6rem] uppercase tracking-widest opacity-35">Less</span>
           <span id="legend" class="flex gap-[5px]"></span>
@@ -43,49 +43,39 @@ import PageLayout from '../layouts/PageLayout.astro';
         </div>
       </div>
 
-      <!-- Month row sits above the grid (injected by JS) -->
-      <div class="flex" style="padding-left: 30px;">
-        <div id="month-labels" class="flex" style="gap: 6px;"></div>
+      <!-- Month labels -->
+      <div class="flex" style="padding-left: 36px;">
+        <div id="month-labels" class="flex w-full" style="gap: 0;"></div>
       </div>
 
-      <!-- Day labels + grid wrapper -->
-      <div class="flex gap-2 mt-1">
-        <!-- Day labels -->
-        <div id="day-labels" class="flex flex-col" style="gap: 6px; padding-top: 2px;">
+      <!-- Day labels + grid -->
+      <div class="flex gap-2 mt-1 w-full">
+        <!-- Day-of-week labels -->
+        <div class="flex flex-col shrink-0" id="day-labels" style="gap: 0; width: 32px;">
           {['Mon','','Wed','','Fri','',''].map(d => (
-            <div style="height:44px; display:flex; align-items:center;">
-              <span class="font-mono text-[0.6rem] opacity-30 tracking-wide w-7 text-right">{d}</span>
+            <div id="day-label-row" class="flex items-center justify-end pr-1">
+              <span class="font-mono text-[0.6rem] opacity-30 tracking-wide">{d}</span>
             </div>
           ))}
         </div>
 
-        <!-- Relative container: heatmap + canvas overlay sit here -->
-        <div id="graph-container" class="relative cursor-pointer select-none" style="line-height:0;">
+        <!-- Graph container -->
+        <div id="graph-container" class="relative flex-1 cursor-pointer select-none" style="line-height:0;">
+          <div id="heatmap" class="grid w-full" style="grid-template-rows: repeat(7, 1fr);"></div>
 
-          <!-- HTML heatmap grid -->
-          <div id="heatmap" class="grid" style="gap: 6px; grid-template-rows: repeat(7, 44px);"></div>
+          <!-- Snake canvas overlay -->
+          <canvas id="snake-canvas"
+            style="position:absolute;top:0;left:0;display:none;border-radius:10px;"></canvas>
 
-          <!-- Snake canvas — same size, hidden until click -->
-          <canvas
-            id="snake-canvas"
-            style="position:absolute; top:0; left:0; display:none; border-radius:12px;"
-          ></canvas>
-
-          <!-- Click-to-start hint -->
+          <!-- Hover hint -->
           <div id="graph-hint"
-            style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:none;opacity:0;transition:opacity 300ms ease;border-radius:12px;background:color-mix(in oklab,var(--color-surface) 60%,transparent);"
-          >
-            <p style="font-family:monospace;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;opacity:0.7;">Click to play Snake</p>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="opacity:0.5;">
-              <rect x="1" y="1" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.2"/>
-              <path d="M10 6v8M6 10l4 4 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:none;opacity:0;transition:opacity 280ms ease;border-radius:10px;background:color-mix(in oklab,var(--color-surface) 55%,transparent);">
+            <p style="font-family:monospace;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;opacity:0.8;">Click to play Snake</p>
           </div>
-
         </div>
       </div>
 
-      <!-- Snake UI bar (hidden until game active) -->
+      <!-- Snake controls bar -->
       <div id="snake-ui" style="display:none;" class="mt-5 flex items-center justify-between">
         <div class="flex items-center gap-6">
           <div>
@@ -95,60 +85,63 @@ import PageLayout from '../layouts/PageLayout.astro';
           <p id="snake-status" class="font-mono text-xs uppercase tracking-widest opacity-50"></p>
         </div>
         <button id="snake-close"
-          class="font-mono text-xs uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
-        >ESC / Close ✕</button>
+          class="font-mono text-xs uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">
+          ESC / Close ✕
+        </button>
       </div>
 
     </div>
-
   </section>
 </PageLayout>
 
 <style>
   .heat-cell {
-    border-radius: 6px;
-    height: 44px;
-    width: 44px;
-    transition: transform 120ms ease, box-shadow 120ms ease;
+    border-radius: 5px;
+    transition: transform 120ms ease;
   }
+  .heat-cell:hover { transform: scale(1.15); }
   #graph-container:hover #graph-hint { opacity: 1 !important; }
+  #day-label-row { height: var(--cell-h, 32px); }
 </style>
 
 <script is:inline>
 /* ═══════════════════════════════════════════════════════
-   HEATMAP
+   HEATMAP  — 16 weeks, full-width, auto cell size
 ═══════════════════════════════════════════════════════ */
 (async function () {
-  const CELL = 44, GAP = 6;
+  const WEEKS = 16;
+  const ROWS  = 7;
+  const GAP   = 5;
 
-  const heatmap  = document.getElementById('heatmap');
-  const loading  = document.getElementById('heatmap-loading');
-  const errorEl  = document.getElementById('heatmap-error');
-  const totalEl  = document.getElementById('heatmap-total');
-  const legend   = document.getElementById('legend');
-  const monthRow = document.getElementById('month-labels');
-  const container= document.getElementById('graph-container');
-  const canvas   = document.getElementById('snake-canvas');
+  const heatmap   = document.getElementById('heatmap');
+  const container = document.getElementById('graph-container');
+  const loading   = document.getElementById('heatmap-loading');
+  const totalEl   = document.getElementById('heatmap-total');
+  const legend    = document.getElementById('legend');
+  const monthRow  = document.getElementById('month-labels');
 
-  // Legend squares
+  // Legend
   [0,1,2,3,4].forEach(function(l) {
     const s = document.createElement('span');
-    s.style.cssText = 'display:inline-block;width:14px;height:14px;border-radius:3px;background:var(--color-accent);opacity:' +
-      (l === 0 ? '0.08' : (0.2 + l*0.2).toFixed(2)) + ';';
+    s.style.cssText = 'display:inline-block;width:13px;height:13px;border-radius:3px;background:var(--color-accent);opacity:' +
+      (l===0 ? '0.09' : (0.2+l*0.2).toFixed(2));
     legend.appendChild(s);
   });
 
-  // Fetch
+  // Build 16-week date range ending today
+  const now   = new Date();
+  const since = new Date(now);
+  since.setDate(since.getDate() - WEEKS*7 + 1);
+  since.setHours(0,0,0,0);
+
   let days = [], counts = {}, total = 0;
   try {
-    const res = await fetch('/api/contributions');
+    const res  = await fetch('/api/contributions');
     if (!res.ok) throw new Error();
     const json = await res.json();
     const cal  = json.data.user.contributionsCollection.contributionCalendar;
     total = cal.totalContributions;
 
-    const now   = new Date();
-    const since = new Date(now); since.setDate(since.getDate()-29); since.setHours(0,0,0,0);
     cal.weeks.forEach(function(w) {
       w.contributionDays.forEach(function(d) {
         const dt = new Date(d.date);
@@ -162,80 +155,121 @@ import PageLayout from '../layouts/PageLayout.astro';
   }
 
   const maxCount = Math.max(1, ...Object.values(counts));
-  const firstRow = (new Date(days[0]).getDay()+6)%7;
-  const cols     = Math.ceil((firstRow + days.length)/7);
+  const firstRow = (new Date(days[0]).getDay()+6)%7; // Mon=0
+  const cols     = Math.ceil((firstRow + days.length) / 7);
 
-  // Size the heatmap and canvas
-  const gridW = cols*(CELL+GAP)-GAP;
-  const gridH = 7*(CELL+GAP)-GAP;
-  heatmap.style.gridTemplateColumns = 'repeat('+cols+', '+CELL+'px)';
-  canvas.width  = gridW;
-  canvas.height = gridH;
-  canvas.style.width  = gridW+'px';
-  canvas.style.height = gridH+'px';
-
-  // Month labels
-  const seen = {};
-  for (let c = 0; c < cols; c++) {
-    const di   = c*7 - firstRow;
-    const day  = days[Math.max(0, Math.min(di, days.length-1))];
-    const month= day ? new Date(day).toLocaleDateString('en-US',{month:'short'}) : '';
-    const span = document.createElement('span');
-    span.style.cssText = 'font-family:monospace;font-size:0.6rem;opacity:0.35;width:'+CELL+'px;display:inline-block;letter-spacing:0.05em;';
-    span.textContent = (month && !seen[month]) ? (seen[month]=1, month) : '';
-    monthRow.appendChild(span);
+  // Compute cell size from container width
+  function calcCell() {
+    const availW = container.offsetWidth;
+    return Math.floor((availW - (cols-1)*GAP) / cols);
   }
 
-  // Leading blanks
-  for (let i=0; i<firstRow; i++) {
-    const e = document.createElement('div');
-    e.style.cssText='border-radius:6px;height:44px;width:44px;background:transparent;';
-    heatmap.appendChild(e);
-  }
+  function buildGrid(CELL) {
+    // Clear
+    heatmap.innerHTML = '';
+    monthRow.innerHTML = '';
 
-  // Day cells
-  days.forEach(function(day) {
-    const count = counts[day]||0;
-    const cell  = document.createElement('div');
-    cell.className = 'heat-cell';
-    cell.style.background = 'var(--color-accent)';
-    if (count===0) {
-      cell.style.opacity = '0.09';
-    } else {
-      const t = Math.min(count/maxCount,1);
-      cell.style.opacity = (0.28+t*0.72).toFixed(2);
-      if (count>1) cell.style.boxShadow='0 0 10px color-mix(in oklab,var(--color-accent) '+Math.round(t*50)+'%,transparent)';
+    const gridH = ROWS*(CELL+GAP)-GAP;
+
+    // Update day-label row heights
+    document.querySelectorAll('#day-label-row').forEach(function(el) {
+      el.style.height = (CELL+GAP)+'px';
+    });
+
+    heatmap.style.gridTemplateColumns = 'repeat('+cols+', '+CELL+'px)';
+    heatmap.style.gridTemplateRows    = 'repeat(7, '+CELL+'px)';
+    heatmap.style.gap                 = GAP+'px';
+
+    // Canvas sizing
+    const gridW = cols*(CELL+GAP)-GAP;
+    const canvas = document.getElementById('snake-canvas');
+    canvas.width  = gridW;
+    canvas.height = gridH;
+    canvas.style.width  = gridW+'px';
+    canvas.style.height = gridH+'px';
+
+    // Month labels
+    const seen = {};
+    for (let c=0; c<cols; c++) {
+      const di    = c*7 - firstRow;
+      const day   = days[Math.max(0, Math.min(di, days.length-1))];
+      const month = day ? new Date(day).toLocaleDateString('en-US',{month:'short'}) : '';
+      const span  = document.createElement('span');
+      span.style.cssText = 'font-family:monospace;font-size:0.6rem;opacity:0.35;width:'+(CELL+GAP)+'px;display:inline-block;letter-spacing:0.05em;';
+      span.textContent = (month && !seen[month]) ? (seen[month]=1,month) : '';
+      monthRow.appendChild(span);
     }
-    cell.title = count===0 ? 'No contributions · '+day : count+' contribution'+(count>1?'s':'')+' · '+day;
-    heatmap.appendChild(cell);
-  });
+
+    // Leading blank cells
+    for (let i=0; i<firstRow; i++) {
+      const e = document.createElement('div');
+      e.style.cssText = 'border-radius:5px;background:transparent;';
+      heatmap.appendChild(e);
+    }
+
+    // Day cells
+    days.forEach(function(day) {
+      const count = counts[day]||0;
+      const cell  = document.createElement('div');
+      cell.className = 'heat-cell';
+      cell.style.background = 'var(--color-accent)';
+      if (count===0) {
+        cell.style.opacity = '0.09';
+      } else {
+        const t = Math.min(count/maxCount,1);
+        cell.style.opacity = (0.28+t*0.72).toFixed(2);
+        if (count>1) cell.style.boxShadow='0 0 10px color-mix(in oklab,var(--color-accent) '+Math.round(t*50)+'%,transparent)';
+      }
+      cell.title = count===0 ? 'No contributions · '+day : count+' contribution'+(count>1?'s':'')+' · '+day;
+      heatmap.appendChild(cell);
+    });
+
+    // Store for snake
+    window._heatGrid = { cols, rows: ROWS, cell: CELL, gap: GAP, w: gridW, h: gridH };
+  }
+
+  // Initial render
+  const CELL = calcCell();
+  buildGrid(CELL);
 
   loading.remove();
-  totalEl.textContent = total+' contributions in the last 30 days';
+  totalEl.textContent = total+' contributions in the last 16 weeks';
   totalEl.classList.remove('hidden');
 
-  // Expose grid info for snake
-  window._heatGrid = { cols: cols, rows: 7, cell: CELL, gap: GAP, w: gridW, h: gridH };
+  // Reflow on resize
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      const c = calcCell();
+      buildGrid(c);
+      if (typeof window._initSnake === 'function') window._initSnake();
+    }, 150);
+  });
 
-  // Init snake (sets up click listener)
   if (typeof window._initSnake === 'function') window._initSnake();
 })();
 
 
 /* ═══════════════════════════════════════════════════════
-   SNAKE (overlay on the graph)
+   SNAKE — overlays the graph canvas
 ═══════════════════════════════════════════════════════ */
 window._initSnake = function() {
-  const container  = document.getElementById('graph-container');
-  const canvas     = document.getElementById('snake-canvas');
-  const heatmap    = document.getElementById('heatmap');
-  const snakeUI    = document.getElementById('snake-ui');
-  const scoreEl    = document.getElementById('snake-score');
-  const statusEl   = document.getElementById('snake-status');
-  const closeBtn   = document.getElementById('snake-close');
-  const hint       = document.getElementById('graph-hint');
+  const container = document.getElementById('graph-container');
+  const canvas    = document.getElementById('snake-canvas');
+  const heatmap   = document.getElementById('heatmap');
+  const snakeUI   = document.getElementById('snake-ui');
+  const scoreEl   = document.getElementById('snake-score');
+  const statusEl  = document.getElementById('snake-status');
+  const closeBtn  = document.getElementById('snake-close');
 
   if (!canvas || !window._heatGrid) return;
+
+  // Detach old listeners by replacing the element clone trick
+  const newContainer = container.cloneNode(false);
+  while (container.firstChild) newContainer.appendChild(container.firstChild);
+  container.parentNode.replaceChild(newContainer, container);
+  const cont = document.getElementById('graph-container');
 
   const G    = window._heatGrid;
   const COLS = G.cols, ROWS = G.rows, CELL = G.cell, GAP = G.gap;
@@ -246,163 +280,114 @@ window._initSnake = function() {
 
   function accent() { return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim()||'#6d28d9'; }
   function paper()  { return getComputedStyle(document.documentElement).getPropertyValue('--color-paper').trim()||'#faf7ff'; }
-
-  function rand(n) { return Math.floor(Math.random()*n); }
+  function rand(n)  { return Math.floor(Math.random()*n); }
 
   function placeFood() {
     const occ = new Set(snake.map(function(s){return s.x+','+s.y;}));
-    let f;
-    do { f={x:rand(COLS),y:rand(ROWS)}; } while(occ.has(f.x+','+f.y));
+    let f; do { f={x:rand(COLS),y:rand(ROWS)}; } while(occ.has(f.x+','+f.y));
     return f;
   }
 
-  function cellPx(x, y) {
-    return { px: x*(CELL+GAP), py: y*(CELL+GAP) };
-  }
+  function px(x,y) { return { px: x*(CELL+GAP), py: y*(CELL+GAP) }; }
 
-  function drawRoundRect(x, y, w, h, r, color, alpha) {
+  function rr(x,y,w,h,r,color,alpha,glow) {
     ctx.globalAlpha = alpha;
     ctx.fillStyle   = color;
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, r);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+    if (glow) { ctx.shadowColor=color; ctx.shadowBlur=glow; }
+    ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill();
+    ctx.shadowBlur=0; ctx.globalAlpha=1;
   }
 
   function draw() {
-    // Background
     ctx.fillStyle = paper();
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(0,0,W,H);
 
-    // Faint grid dots
-    ctx.fillStyle = accent();
-    for (let c=0; c<COLS; c++) {
-      for (let r=0; r<ROWS; r++) {
-        const {px,py} = cellPx(c,r);
-        ctx.globalAlpha = 0.07;
-        ctx.beginPath();
-        ctx.roundRect(px, py, CELL, CELL, 6);
-        ctx.fill();
-      }
+    // Ghost grid
+    for (let c=0;c<COLS;c++) for (let r=0;r<ROWS;r++) {
+      const {px:x,py:y}=px(c,r);
+      rr(x,y,CELL,CELL,5,accent(),0.07,0);
     }
-    ctx.globalAlpha = 1;
 
-    // Food — pulsing glow
-    const pulse = 0.7 + 0.3*Math.sin(Date.now()/250);
-    const {px:fx, py:fy} = cellPx(food.x, food.y);
-    // Glow
-    ctx.shadowColor = accent();
-    ctx.shadowBlur  = 18*pulse;
-    drawRoundRect(fx+3, fy+3, CELL-6, CELL-6, 8, accent(), pulse);
-    ctx.shadowBlur = 0;
+    // Food pulse
+    const pulse = 0.7+0.3*Math.sin(Date.now()/220);
+    const {px:fx,py:fy}=px(food.x,food.y);
+    rr(fx+3,fy+3,CELL-6,CELL-6,8,accent(),pulse,16*pulse);
 
     // Snake
-    snake.forEach(function(seg, i) {
-      const isHead = i===0;
-      const {px,py} = cellPx(seg.x, seg.y);
-      const pad = isHead ? 2 : 3;
-      const alpha = isHead ? 1 : Math.max(0.3, 1 - (i/snake.length)*0.55);
-      ctx.shadowColor = accent();
-      ctx.shadowBlur  = isHead ? 12 : 0;
-      drawRoundRect(px+pad, py+pad, CELL-pad*2, CELL-pad*2, isHead?7:5, accent(), alpha);
-      ctx.shadowBlur = 0;
+    snake.forEach(function(seg,i) {
+      const {px:sx,py:sy}=px(seg.x,seg.y);
+      const isHead=i===0;
+      const pad=isHead?1:3;
+      const alpha=isHead?1:Math.max(0.28,1-(i/snake.length)*0.6);
+      rr(sx+pad,sy+pad,CELL-pad*2,CELL-pad*2,isHead?7:4,accent(),alpha,isHead?14:0);
     });
 
     if (dead) {
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillStyle='rgba(0,0,0,0.5)';
       ctx.fillRect(0,0,W,H);
-      ctx.textAlign  = 'center';
-      ctx.fillStyle  = '#fff';
-      ctx.globalAlpha= 0.92;
-      ctx.font       = 'bold 26px monospace';
-      ctx.fillText('GAME OVER', W/2, H/2-18);
-      ctx.font       = '13px monospace';
-      ctx.globalAlpha= 0.6;
-      ctx.fillText('Score: '+score+'   ·   R to restart', W/2, H/2+14);
-      ctx.globalAlpha= 1;
-      ctx.textAlign  = 'left';
+      ctx.textAlign='center';
+      ctx.globalAlpha=0.92; ctx.fillStyle='#fff';
+      ctx.font='bold 24px monospace'; ctx.fillText('GAME OVER',W/2,H/2-16);
+      ctx.font='12px monospace'; ctx.globalAlpha=0.55;
+      ctx.fillText('Score: '+score+'   ·   R to restart · ESC to close',W/2,H/2+14);
+      ctx.globalAlpha=1; ctx.textAlign='left';
     }
   }
 
   function step() {
-    dir = nextDir;
-    const head = {x: snake[0].x+dir.x, y: snake[0].y+dir.y};
-    if (head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS) return end();
-    if (snake.some(function(s){return s.x===head.x&&s.y===head.y;})) return end();
+    dir=nextDir;
+    const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+    if (head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS) return endGame();
+    if (snake.some(function(s){return s.x===head.x&&s.y===head.y;})) return endGame();
     snake.unshift(head);
-    if (head.x===food.x&&head.y===food.y) {
-      score++;
-      scoreEl.textContent = score;
-      food = placeFood();
-    } else {
-      snake.pop();
-    }
+    if (head.x===food.x&&head.y===food.y) { score++; scoreEl.textContent=score; food=placeFood(); }
+    else snake.pop();
     draw();
   }
 
-  function end() {
-    dead=true; running=false;
-    clearInterval(loop);
-    draw();
-    statusEl.textContent = 'R to restart · ESC to close';
+  function endGame() {
+    dead=true; running=false; clearInterval(loop); draw();
+    statusEl.textContent='R to restart · ESC to close';
   }
 
   function startGame() {
     if (running) return;
-    const midX = Math.floor(COLS/2), midY = Math.floor(ROWS/2);
-    snake   = [{x:midX,y:midY},{x:midX-1,y:midY},{x:midX-2,y:midY}];
-    dir     = {x:1,y:0};
-    nextDir = {x:1,y:0};
-    food    = placeFood();
-    score   = 0; dead = false;
-    scoreEl.textContent = '0';
-    statusEl.textContent = 'Arrow keys to move · R to restart · ESC to close';
-
-    // Show canvas, hide HTML grid
-    heatmap.style.visibility = 'hidden';
-    canvas.style.display     = 'block';
-    snakeUI.style.display    = 'flex';
-    hint.style.pointerEvents = 'none';
-
-    running = true;
-    loop    = setInterval(step, 105);
+    const mx=Math.floor(COLS/2), my=Math.floor(ROWS/2);
+    snake=[{x:mx,y:my},{x:mx-1,y:my},{x:mx-2,y:my}];
+    dir=nextDir={x:1,y:0};
+    food=placeFood(); score=0; dead=false;
+    scoreEl.textContent='0';
+    statusEl.textContent='Arrow keys · R restart · ESC close';
+    heatmap.style.visibility='hidden';
+    canvas.style.display='block';
+    snakeUI.style.display='flex';
+    running=true;
+    loop=setInterval(step,100);
     draw();
   }
 
   function closeGame() {
-    clearInterval(loop);
-    running=false; dead=false;
-    canvas.style.display     = 'none';
-    heatmap.style.visibility = 'visible';
-    snakeUI.style.display    = 'none';
-    statusEl.textContent     = '';
+    clearInterval(loop); running=false; dead=false;
+    canvas.style.display='none';
+    heatmap.style.visibility='visible';
+    snakeUI.style.display='none';
+    statusEl.textContent='';
   }
 
-  // Click graph → start
-  container.addEventListener('click', function() {
-    if (!running && !dead) startGame();
-  });
-
+  cont.addEventListener('click', function() { if (!running&&!dead) startGame(); });
   closeBtn.addEventListener('click', closeGame);
 
   window.addEventListener('keydown', function(e) {
-    const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-    if (arrows.includes(e.key)) e.preventDefault();
-
-    if (e.key==='Escape')            { closeGame(); return; }
-    if ((e.key==='r'||e.key==='R') && (running||dead)) {
-      clearInterval(loop); running=false; dead=false; startGame(); return;
-    }
-
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+    if (e.key==='Escape') { closeGame(); return; }
+    if ((e.key==='r'||e.key==='R')&&(running||dead)) { clearInterval(loop);running=false;dead=false;startGame();return; }
     if (!running) return;
-    const map = {ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}};
-    const d   = map[e.key];
-    if (!d) return;
+    const map={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}};
+    const d=map[e.key]; if (!d) return;
     if (d.x===-dir.x&&d.y===-dir.y) return;
-    nextDir = d;
+    nextDir=d;
   });
 };
 
-// If heatmap already loaded, init now; otherwise heatmap loader calls it
 if (window._heatGrid) window._initSnake();
 </script>

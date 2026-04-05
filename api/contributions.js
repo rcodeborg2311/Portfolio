@@ -11,7 +11,7 @@ export default async function handler(req) {
 
   const now   = new Date();
   const since = new Date(now);
-  since.setDate(since.getDate() - 29);
+  since.setDate(since.getDate() - 16*7 + 1); // 16 weeks
 
   const query = `
     query($username: String!, $from: DateTime!, $to: DateTime!) {
