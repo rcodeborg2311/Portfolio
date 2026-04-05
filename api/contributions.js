@@ -10,8 +10,9 @@ export default async function handler(req) {
   }
 
   const now   = new Date();
-  const since = new Date(now);
-  since.setDate(since.getDate() - 16*7 + 1); // 16 weeks
+  const since = new Date(now.getFullYear(), 11, 1); // Dec 1 of current year
+  // If we're before Dec, use last year's Dec 1
+  if (now.getMonth() < 11) since.setFullYear(now.getFullYear() - 1);
 
   const query = `
     query($username: String!, $from: DateTime!, $to: DateTime!) {

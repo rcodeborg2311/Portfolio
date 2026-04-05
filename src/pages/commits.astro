@@ -24,7 +24,7 @@ import PageLayout from '../layouts/PageLayout.astro';
       </div>
       <div class="md:col-span-2 flex items-start">
         <p class="text-base opacity-70 leading-relaxed max-w-lg">
-          Last 16 weeks across all repos. <span class="opacity-50">Click the graph to play Snake on it.</span>
+          December to today across all repos. <span class="opacity-50">Click the graph to play Snake on it.</span>
         </p>
       </div>
     </div>
@@ -109,7 +109,6 @@ import PageLayout from '../layouts/PageLayout.astro';
    HEATMAP  — 16 weeks, full-width, auto cell size
 ═══════════════════════════════════════════════════════ */
 (async function () {
-  const WEEKS = 16;
   const ROWS  = 7;
   const GAP   = 5;
 
@@ -128,10 +127,10 @@ import PageLayout from '../layouts/PageLayout.astro';
     legend.appendChild(s);
   });
 
-  // Build 16-week date range ending today
+  // Dec 1 → today
   const now   = new Date();
-  const since = new Date(now);
-  since.setDate(since.getDate() - WEEKS*7 + 1);
+  const since = new Date(now.getFullYear(), 11, 1); // Dec 1
+  if (now.getMonth() < 11) since.setFullYear(now.getFullYear() - 1);
   since.setHours(0,0,0,0);
 
   let days = [], counts = {}, total = 0;
@@ -235,7 +234,7 @@ import PageLayout from '../layouts/PageLayout.astro';
   buildGrid(CELL);
 
   loading.remove();
-  totalEl.textContent = total+' contributions in the last 16 weeks';
+  totalEl.textContent = total+' contributions since December 1';
   totalEl.classList.remove('hidden');
 
   // Reflow on resize
