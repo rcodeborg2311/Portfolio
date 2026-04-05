@@ -29,9 +29,11 @@ import PageLayout from '../layouts/PageLayout.astro';
       </div>
     </div>
 
-    <!-- Heatmap — 75% width -->
+    <!-- ── Heatmap ── -->
     <div class="mt-12" style="width: 75%;">
-      <div class="flex items-center justify-between mb-5">
+
+      <!-- Top bar: label + legend -->
+      <div class="flex items-center justify-between mb-3">
         <p class="font-mono text-xs uppercase tracking-widest opacity-50">Last 30 days</p>
         <div class="flex items-center gap-2">
           <span class="font-mono text-[0.6rem] uppercase tracking-widest opacity-40">Less</span>
@@ -40,14 +42,59 @@ import PageLayout from '../layouts/PageLayout.astro';
         </div>
       </div>
 
-      <div id="heatmap-wrap" class="w-full">
-        <div id="heatmap" class="grid gap-[5px]" style="grid-template-rows: repeat(7, 1fr);">
+      <!-- Month labels row -->
+      <div id="month-labels" class="flex mb-1" style="padding-left: 28px; gap: 5px;"></div>
+
+      <div class="flex gap-2">
+        <!-- Day-of-week labels -->
+        <div class="flex flex-col justify-around" style="gap: 5px; padding-top: 0;">
+          {['M','','W','','F','',''].map(d => (
+            <span class="font-mono text-[0.6rem] opacity-35 leading-none" style="height: 18px; display:flex; align-items:center;">{d}</span>
+          ))}
+        </div>
+
+        <!-- Grid -->
+        <div id="heatmap-wrap" class="flex-1">
+          <div id="heatmap" class="grid" style="gap: 5px; grid-template-rows: repeat(7, 18px);"></div>
         </div>
       </div>
 
       <p id="heatmap-loading" class="font-mono text-xs uppercase tracking-widest opacity-40 mt-6">Loading…</p>
-      <p id="heatmap-error" class="font-mono text-xs uppercase tracking-widest opacity-40 mt-6 hidden">Could not load contribution data.</p>
-      <p id="heatmap-total" class="mt-5 font-mono text-sm tracking-widest opacity-60 hidden"></p>
+      <p id="heatmap-error"   class="font-mono text-xs uppercase tracking-widest opacity-40 mt-6 hidden">Could not load contribution data.</p>
+      <p id="heatmap-total"   class="mt-5 font-mono text-sm tracking-widest opacity-60 hidden"></p>
+    </div>
+
+    <!-- ── Snake game ── -->
+    <div class="mt-20 border-t border-[color:var(--color-border)] pt-14">
+      <div class="flex items-end justify-between mb-6">
+        <div>
+          <p class="eyebrow mb-2">Mini Game</p>
+          <h2 class="text-xl font-bold uppercase tracking-widest">Snake</h2>
+          <p class="text-sm opacity-60 mt-1">Arrow keys to move · R to restart</p>
+        </div>
+        <div class="text-right font-mono">
+          <p class="text-xs uppercase tracking-widest opacity-40">Score</p>
+          <p id="snake-score" class="text-3xl font-bold">0</p>
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <div class="relative inline-block rounded-2xl overflow-hidden border border-[color:var(--color-border)]">
+        <canvas id="snake-canvas" width="560" height="420"></canvas>
+        <!-- Overlay shown before game starts -->
+        <div id="snake-overlay"
+          class="absolute inset-0 flex flex-col items-center justify-center gap-4 cursor-pointer"
+          style="background: color-mix(in oklab, var(--color-surface) 88%, transparent); backdrop-filter: blur(4px);"
+        >
+          <p class="font-mono text-xs uppercase tracking-widest opacity-50">Press any arrow key or click to start</p>
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" style="opacity:0.4;">
+            <rect x="1" y="1" width="34" height="34" rx="8" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M18 11v14M11 18l7 7 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <p id="snake-status" class="mt-4 font-mono text-xs uppercase tracking-widest opacity-40"></p>
     </div>
 
   </section>
@@ -55,13 +102,14 @@ import PageLayout from '../layouts/PageLayout.astro';
 
 <style>
   .heat-cell {
-    border-radius: 4px;
-    aspect-ratio: 1;
-    transition: opacity 200ms ease, transform 200ms ease;
+    border-radius: 3px;
+    transition: opacity 150ms ease, transform 150ms ease;
     cursor: default;
+    height: 18px;
+    width: 18px;
   }
   .heat-cell:hover {
-    transform: scale(1.25);
+    transform: scale(1.3);
     opacity: 1 !important;
     z-index: 10;
     position: relative;
@@ -69,43 +117,36 @@ import PageLayout from '../layouts/PageLayout.astro';
 </style>
 
 <script is:inline>
+/* ═══════════════════════════════════════════════════════════════
+   HEATMAP
+═══════════════════════════════════════════════════════════════ */
 (async function () {
   const heatmap  = document.getElementById('heatmap');
   const loading  = document.getElementById('heatmap-loading');
   const errorEl  = document.getElementById('heatmap-error');
   const totalEl  = document.getElementById('heatmap-total');
   const legend   = document.getElementById('legend');
+  const monthRow = document.getElementById('month-labels');
 
-  // ── Legend ───────────────────────────────────────────────────
-  [0, 1, 2, 3, 4].forEach(function(level) {
+  // Legend
+  [0,1,2,3,4].forEach(function(level) {
     const sq = document.createElement('span');
-    sq.style.display      = 'inline-block';
-    sq.style.width        = '14px';
-    sq.style.height       = '14px';
-    sq.style.borderRadius = '3px';
-    sq.style.background   = 'var(--color-accent)';
-    sq.style.opacity      = level === 0 ? '0.08' : (0.2 + level * 0.2).toFixed(2);
+    sq.style.cssText = 'display:inline-block;width:14px;height:14px;border-radius:3px;background:var(--color-accent);opacity:' +
+      (level === 0 ? '0.08' : (0.2 + level * 0.2).toFixed(2));
     legend.appendChild(sq);
   });
 
-  // ── Fetch from proxy ─────────────────────────────────────────
-  let days = [];
-  let counts = {};
-  let total = 0;
+  let days = [], counts = {}, total = 0;
 
   try {
     const res  = await fetch('/api/contributions');
     if (!res.ok) throw new Error();
     const json = await res.json();
-
-    const cal = json.data.user.contributionsCollection.contributionCalendar;
+    const cal  = json.data.user.contributionsCollection.contributionCalendar;
     total = cal.totalContributions;
 
-    // Flatten all days from the last 30 days only
     const now   = new Date();
-    const since = new Date(now);
-    since.setDate(since.getDate() - 29);
-    since.setHours(0, 0, 0, 0);
+    const since = new Date(now); since.setDate(since.getDate() - 29); since.setHours(0,0,0,0);
 
     cal.weeks.forEach(function(week) {
       week.contributionDays.forEach(function(day) {
@@ -116,60 +157,249 @@ import PageLayout from '../layouts/PageLayout.astro';
         }
       });
     });
-
-    // Sort chronologically
     days.sort();
-
   } catch (_) {
     loading.classList.add('hidden');
     errorEl.classList.remove('hidden');
     return;
   }
 
-  // ── Build grid ───────────────────────────────────────────────
   const maxCount = Math.max(1, ...Object.values(counts));
-  const firstRow = (new Date(days[0]).getDay() + 6) % 7; // Mon=0
+  const firstRow = (new Date(days[0]).getDay() + 6) % 7;
   const cols     = Math.ceil((firstRow + days.length) / 7);
-  const gapPx    = 5;
-  const cellSize = 'calc((100% - ' + ((cols - 1) * gapPx) + 'px) / ' + cols + ')';
+  const cellW    = 18, gap = 5;
 
-  heatmap.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellSize + ')';
-  heatmap.style.gridTemplateRows    = 'repeat(7, ' + cellSize + ')';
+  heatmap.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellW + 'px)';
 
-  // Leading empty cells
+  // Month labels
+  const seenMonths = {};
+  for (let col = 0; col < cols; col++) {
+    const dayIdx = col * 7 - firstRow;
+    const day    = days[Math.max(0, dayIdx)];
+    if (!day) { monthRow.innerHTML += '<span style="width:' + cellW + 'px"></span>'; continue; }
+    const month = new Date(day).toLocaleDateString('en-US', { month: 'short' });
+    const span  = document.createElement('span');
+    span.style.cssText = 'font-family:monospace;font-size:0.6rem;opacity:0.4;width:' + cellW + 'px;display:inline-block;letter-spacing:0.05em;';
+    span.textContent   = seenMonths[month] ? '' : month;
+    seenMonths[month]  = true;
+    monthRow.appendChild(span);
+  }
+
+  // Empty leading cells
   for (let i = 0; i < firstRow; i++) {
-    const empty = document.createElement('div');
-    empty.className = 'heat-cell';
-    empty.style.background = 'transparent';
-    heatmap.appendChild(empty);
+    const e = document.createElement('div');
+    e.style.cssText = 'border-radius:3px;height:18px;width:18px;background:transparent;';
+    heatmap.appendChild(e);
   }
 
   // Day cells
   days.forEach(function(day) {
     const count = counts[day] || 0;
     const cell  = document.createElement('div');
-    cell.className       = 'heat-cell';
+    cell.className = 'heat-cell';
     cell.style.background = 'var(--color-accent)';
-
     if (count === 0) {
       cell.style.opacity = '0.08';
     } else {
-      const intensity = Math.min(count / maxCount, 1);
-      cell.style.opacity = (0.25 + intensity * 0.75).toFixed(2);
-      if (count > 1) {
-        cell.style.boxShadow = '0 0 8px color-mix(in oklab, var(--color-accent) ' + Math.round(intensity * 55) + '%, transparent)';
-      }
+      const t = Math.min(count / maxCount, 1);
+      cell.style.opacity = (0.25 + t * 0.75).toFixed(2);
+      if (count > 1) cell.style.boxShadow = '0 0 7px color-mix(in oklab,var(--color-accent) ' + Math.round(t*55) + '%,transparent)';
     }
-
-    cell.title = count === 0
-      ? 'No contributions on ' + day
-      : count + ' contribution' + (count > 1 ? 's' : '') + ' on ' + day;
-
+    cell.title = count === 0 ? 'No contributions on ' + day : count + ' contribution' + (count>1?'s':'') + ' on ' + day;
     heatmap.appendChild(cell);
   });
 
   loading.remove();
   totalEl.textContent = total + ' contributions in the last 30 days';
   totalEl.classList.remove('hidden');
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SNAKE GAME
+═══════════════════════════════════════════════════════════════ */
+(function () {
+  const canvas  = document.getElementById('snake-canvas');
+  const ctx     = canvas.getContext('2d');
+  const overlay = document.getElementById('snake-overlay');
+  const scoreEl = document.getElementById('snake-score');
+  const statusEl= document.getElementById('snake-status');
+
+  const COLS = 28, ROWS = 21, CELL = 20;
+  const W = COLS * CELL, H = ROWS * CELL;
+  canvas.width  = W;
+  canvas.height = H;
+
+  // Accent color from CSS var
+  function accentColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || '#6d28d9';
+  }
+  function inkColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--color-ink').trim() || '#160730';
+  }
+  function surfaceColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--color-surface').trim() || '#f2e9ff';
+  }
+  function paperColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--color-paper').trim() || '#faf7ff';
+  }
+
+  let snake, dir, nextDir, food, score, gameLoop, running, dead;
+
+  function rand(max) { return Math.floor(Math.random() * max); }
+
+  function placeFood() {
+    const occupied = new Set(snake.map(function(s){ return s.x+','+s.y; }));
+    let f;
+    do { f = { x: rand(COLS), y: rand(ROWS) }; } while (occupied.has(f.x+','+f.y));
+    return f;
+  }
+
+  function init() {
+    snake   = [{ x: 14, y: 10 }, { x: 13, y: 10 }, { x: 12, y: 10 }];
+    dir     = { x: 1, y: 0 };
+    nextDir = { x: 1, y: 0 };
+    food    = placeFood();
+    score   = 0;
+    dead    = false;
+    scoreEl.textContent = '0';
+    statusEl.textContent = '';
+  }
+
+  function drawGrid() {
+    ctx.strokeStyle = 'color-mix(in oklab, ' + accentColor() + ' 7%, transparent)';
+    // fallback — just use a very faint line
+    ctx.strokeStyle = 'rgba(128,128,128,0.07)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x <= W; x += CELL) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y <= H; y += CELL) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+  }
+
+  function drawCell(x, y, color, alpha, radius) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle   = color;
+    const pad = 2;
+    const r   = radius || 4;
+    const rx  = x * CELL + pad, ry = y * CELL + pad;
+    const rw  = CELL - pad*2,    rh = CELL - pad*2;
+    ctx.beginPath();
+    ctx.roundRect(rx, ry, rw, rh, r);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  function draw() {
+    // Background
+    ctx.fillStyle = paperColor();
+    ctx.fillRect(0, 0, W, H);
+    drawGrid();
+
+    // Food — pulsing dot
+    const pulse = 0.65 + 0.35 * Math.sin(Date.now() / 300);
+    drawCell(food.x, food.y, accentColor(), pulse, 6);
+
+    // Snake
+    snake.forEach(function(seg, i) {
+      const isHead = i === 0;
+      const alpha  = isHead ? 1 : Math.max(0.35, 1 - (i / snake.length) * 0.6);
+      drawCell(seg.x, seg.y, accentColor(), alpha, isHead ? 6 : 4);
+    });
+
+    // Dead overlay
+    if (dead) {
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#fff';
+      ctx.globalAlpha = 0.9;
+      ctx.font = 'bold 28px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('GAME OVER', W/2, H/2 - 16);
+      ctx.font = '13px monospace';
+      ctx.globalAlpha = 0.6;
+      ctx.fillText('Score: ' + score + '   ·   Press R to restart', W/2, H/2 + 16);
+      ctx.globalAlpha = 1;
+      ctx.textAlign = 'left';
+    }
+  }
+
+  function step() {
+    dir = nextDir;
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+    // Wall collision
+    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+      return endGame();
+    }
+    // Self collision
+    if (snake.some(function(s){ return s.x === head.x && s.y === head.y; })) {
+      return endGame();
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      score++;
+      scoreEl.textContent = score;
+      food = placeFood();
+    } else {
+      snake.pop();
+    }
+
+    draw();
+  }
+
+  function endGame() {
+    dead = true;
+    running = false;
+    clearInterval(gameLoop);
+    draw();
+    statusEl.textContent = 'Press R to play again';
+  }
+
+  function startGame() {
+    if (running) return;
+    overlay.style.display = 'none';
+    init();
+    running  = true;
+    gameLoop = setInterval(step, 110);
+    draw();
+  }
+
+  // Draw initial frame
+  init();
+  draw();
+
+  // Input
+  window.addEventListener('keydown', function(e) {
+    const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+    if (arrows.includes(e.key)) {
+      e.preventDefault();
+      if (!running && !dead) { startGame(); }
+    }
+    if (e.key === 'r' || e.key === 'R') {
+      clearInterval(gameLoop);
+      running = false;
+      dead    = false;
+      init();
+      startGame();
+      return;
+    }
+    const map = { ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1}, ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0} };
+    if (!map[e.key]) return;
+    const d = map[e.key];
+    // Prevent reversing
+    if (d.x === -dir.x && d.y === -dir.y) return;
+    nextDir = d;
+  });
+
+  overlay.addEventListener('click', startGame);
+
+  // Redraw on theme change (MutationObserver)
+  const obs = new MutationObserver(function() { if (!running) draw(); });
+  obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 })();
 </script>
