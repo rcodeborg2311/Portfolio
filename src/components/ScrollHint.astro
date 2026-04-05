@@ -15,7 +15,8 @@
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
     opacity: 1;
     transition: opacity 400ms ease;
   "
@@ -77,6 +78,7 @@
     });
 
     let currentLabel = '';
+    let nextSection: Element | null = null;
 
     function update() {
       const midY = window.innerHeight * 0.5;
@@ -92,12 +94,13 @@
       const nextIdx = activeIdx + 1;
 
       if (nextIdx >= sections.length) {
-        // Past last section — fade out
         hint.style.opacity = '0';
+        nextSection = null;
         return;
       }
 
       hint.style.opacity = '1';
+      nextSection = sections[nextIdx];
 
       // Find the first non-empty label from nextIdx onwards
       let nextLabel = '';
@@ -111,7 +114,6 @@
       }
 
       if (nextLabel !== currentLabel) {
-        // Brief fade-through on change
         label.style.opacity = '0';
         setTimeout(() => {
           label.textContent = nextLabel;
@@ -120,6 +122,13 @@
         currentLabel = nextLabel;
       }
     }
+
+    // Click scrolls to next section
+    hint.addEventListener('click', () => {
+      if (nextSection) {
+        nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
 
     // Init
     update();

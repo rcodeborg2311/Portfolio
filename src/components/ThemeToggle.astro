@@ -1,5 +1,4 @@
 ---
-// Theme toggle button with local storage persistence
 export interface Props {
   class?: string;
 }
@@ -7,18 +6,42 @@ const { class: className = '' } = Astro.props as Props;
 ---
 
 <button
-	type="button"
-	data-theme-toggle
-	aria-label="Toggle theme"
-	class={className}
+  type="button"
+  data-theme-toggle
+  aria-label="Toggle theme"
+  class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[color:var(--color-border)] text-[0.6rem] font-semibold tracking-widest uppercase cursor-pointer opacity-55 hover:opacity-100 hover:border-[color:var(--color-ink)] transition-all duration-200 ${className}`}
 >
-	<span class="sr-only">Toggle theme</span>
-	<span class="theme-toggle__icon inline-flex [html[data-theme='dark']_&]:hidden [html[data-theme='blue']_&]:hidden" aria-hidden="true">
-		Dark
-	</span>
-	<span class="theme-toggle__icon hidden [html[data-theme='dark']_&]:inline-flex" aria-hidden="true">
-		Light
-	</span>
+  <!-- Moon icon — shown in light mode (click to go dark) -->
+  <svg
+    class="[html[data-theme='dark']_&]:hidden"
+    width="11" height="11" viewBox="0 0 24 24"
+    fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+  <span class="[html[data-theme='dark']_&]:hidden">Dark</span>
+
+  <!-- Sun icon — shown in dark mode (click to go light) -->
+  <svg
+    class="hidden [html[data-theme='dark']_&]:block"
+    width="11" height="11" viewBox="0 0 24 24"
+    fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/>
+    <line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/>
+    <line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+  <span class="hidden [html[data-theme='dark']_&]:inline">Light</span>
 </button>
 
 <script is:inline>
@@ -26,40 +49,28 @@ const STORAGE_KEY = 'theme';
 const THEMES = ['light', 'dark'];
 
 const getPreferredTheme = () => {
-	const stored = localStorage.getItem(STORAGE_KEY);
-	if (THEMES.includes(stored ?? '')) return stored;
-	return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (THEMES.includes(stored ?? '')) return stored;
+  return 'dark';
 };
 
 const applyTheme = (theme) => {
-	document.documentElement.dataset.theme = theme;
-	const buttons = document.querySelectorAll('[data-theme-toggle]');
-	buttons.forEach((b) => b.setAttribute('aria-label', `Toggle theme (current: ${theme})`));
-};
-
-const nextTheme = (current) => {
-	const idx = THEMES.indexOf(current);
-	const nextIdx = idx === -1 ? 0 : (idx + 1) % THEMES.length;
-	return THEMES[nextIdx];
+  document.documentElement.dataset.theme = theme;
 };
 
 const toggleTheme = () => {
-	const current = document.documentElement.dataset.theme || getPreferredTheme();
-	const next = nextTheme(current);
-	localStorage.setItem(STORAGE_KEY, next);
-	applyTheme(next);
+  const current = document.documentElement.dataset.theme || getPreferredTheme();
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem(STORAGE_KEY, next);
+  applyTheme(next);
 };
 
-// init
 applyTheme(getPreferredTheme());
 
-// delegated listener: works for all existing and future instances (mobile, dynamic, etc.)
 document.addEventListener('click', (e) => {
-	const t = e.target;
-	if (!(t instanceof Element)) return;
-	const btn = t.closest('[data-theme-toggle]');
-	if (!btn) return;
-	e.preventDefault();
-	toggleTheme();
+  const btn = e.target?.closest?.('[data-theme-toggle]');
+  if (!btn) return;
+  e.preventDefault();
+  toggleTheme();
 });
 </script>
