@@ -17,57 +17,77 @@ import { withBase } from "../utils/slugify";
 
 const isExternal = (path: string) => /^[a-z][a-z0-9+.-]*:/i.test(path) || path.startsWith('//');
 
-const { title, description, actions = [], role, location } = Astro.props as Props; 
+const { title, description, actions = [], role, location } = Astro.props as Props;
 ---
 
-<section class="flex flex-col justify-between" style="min-height: calc(100vh - (var(--grid-cell) / 2));">
-  <div class="grid gap-3 md:gap-4 max-w-3xl pb-6 md:pb-10">
-    <div class="flex flex-col lg:flex-row lg:justify-between items-start gap-8">
-      <div
-        class="hero-letters text-[10vw] md:text-[10rem] lg:text-[10rem] leading-[0.85] font-extrabold text-base-900 uppercase"
-        aria-hidden="true"
-      >
-        {title}
-      </div>
-    </div>
+<section
+  class="flex flex-col justify-between"
+  style="min-height: calc(100vh - 56px);"
+>
+  <!-- Display name — enormous, staggered in -->
+  <div class="px-6 md:px-8 pt-12 md:pt-16 pb-0">
+    <h1
+      class="anim anim-1 font-extrabold uppercase leading-[0.88] tracking-[-0.02em] select-none"
+      style="font-size: clamp(4rem, 14vw, 13rem);"
+      aria-hidden="true"
+    >
+      {title.split(" ").map((word, i) => (
+        <span class="block">{word}</span>
+      ))}
+    </h1>
   </div>
 
-  <div class="max-w-360 mx-auto px-8 w-full mt-auto">
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 border-b pb-8 border-base-200">
-      <div>
-        {role && <h1 class="text-base text-base-900 font-bold uppercase">{role}</h1>}
-      </div>
+  <!-- Divider line — draws left→right -->
+  <div class="mx-6 md:mx-8 my-8 md:my-10">
+    <div class="anim-rule h-px bg-[color:var(--color-accent)]" style="opacity:0.35"></div>
+  </div>
 
-      <div class="md:col-span-1">
-        {description && <p class="text-base-600">{description}</p>}
-        {location && <p class="text-base-600 mt-2">{location}</p>}
-      </div>
+  <!-- Info bar — role / description / actions -->
+  <div class="anim anim-3 px-6 md:px-8 pb-12 md:pb-16">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
 
-      <div class="md:col-span-1 flex items-start md:justify-end">
-        {actions.length > 0 && (
-          <div class="mt-0 md:mt-0 flex flex-col md:flex-row md:items-start md:justify-end gap-3">
-            {actions.map((action) => (
-              isExternal(action.href) ? (
-                <a
-                  class="text-sm text-base-900 hover:text-base-500 font-bold uppercase inline-block px-4 py-2"
-                  href={action.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {action.label}
-                </a>
-              ) : (
-                <a
-                  class="text-sm text-base-900 hover:text-base-500 font-bold uppercase inline-block px-4 py-2"
-                  href={withBase(action.href)}
-                >
-                  {action.label}
-                </a>
-              )
-            ))}
-          </div>
+      <!-- Role + location -->
+      <div class="space-y-1">
+        {role && (
+          <p class="text-xs font-semibold uppercase tracking-widest">{role}</p>
+        )}
+        {location && (
+          <p class="text-xs opacity-70 tracking-wide">{location}</p>
         )}
       </div>
+
+      <!-- Bio -->
+      <div class="md:col-span-1">
+        {description && (
+          <p class="leading-relaxed text-sm">{description}</p>
+        )}
+      </div>
+
+      <!-- Actions -->
+      {actions.length > 0 && (
+        <div class="flex flex-col sm:flex-row md:flex-col lg:flex-row gap-3 md:items-start lg:justify-end">
+          {actions.map((action, i) => (
+            isExternal(action.href) ? (
+              <a
+                href={action.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class={`text-xs font-semibold uppercase tracking-widest transition-opacity duration-200 ${i === 0 ? 'opacity-100 hover:opacity-60' : 'opacity-70 hover:opacity-100'}`}
+              >
+                {action.label} →
+              </a>
+            ) : (
+              <a
+                href={withBase(action.href)}
+                class={`text-xs font-semibold uppercase tracking-widest transition-opacity duration-200 ${i === 0 ? 'opacity-100 hover:opacity-60' : 'opacity-70 hover:opacity-100'}`}
+              >
+                {action.label} →
+              </a>
+            )
+          ))}
+        </div>
+      )}
+
     </div>
   </div>
 </section>
