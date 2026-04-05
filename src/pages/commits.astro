@@ -1,0 +1,112 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout title="Commit History | Ridham Patel" description="Recent commits to this portfolio repository.">
+  <section class="max-w-[90rem] mx-auto px-8 py-16">
+
+    <!-- Header -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-10 border-b border-[color:var(--color-border)]">
+      <div class="flex flex-col gap-4">
+        <p class="eyebrow">Portfolio Repo</p>
+        <h1 class="text-2xl font-bold uppercase tracking-widest leading-tight">Commit<br/>History</h1>
+        <a
+          href="https://github.com/rcodeborg2311/Portfolio"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest opacity-60 hover:opacity-100 hover:text-[color:var(--color-accent)] transition-all duration-200"
+        >
+          View on GitHub
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+      <div class="md:col-span-2 flex items-start">
+        <p class="text-base opacity-70 leading-relaxed max-w-lg">
+          Live changelog of every update made to this site — fetched directly from GitHub.
+        </p>
+      </div>
+    </div>
+
+    <!-- Commit list -->
+    <div id="commit-list" class="mt-10 flex flex-col divide-y divide-[color:var(--color-border)]">
+      <!-- Loading state -->
+      <div id="commit-loading" class="py-10 text-center font-mono text-sm opacity-50 tracking-widest uppercase">
+        Loading commits…
+      </div>
+    </div>
+
+    <!-- Error state (hidden by default) -->
+    <div id="commit-error" class="hidden mt-10 py-10 text-center font-mono text-sm opacity-50 tracking-widest uppercase">
+      Could not load commits. <a href="https://github.com/rcodeborg2311/Portfolio/commits/main" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 hover:opacity-100">View on GitHub →</a>
+    </div>
+
+  </section>
+</PageLayout>
+
+<script is:inline>
+  (async function () {
+    const list    = document.getElementById('commit-list');
+    const loading = document.getElementById('commit-loading');
+    const error   = document.getElementById('commit-error');
+
+    try {
+      const res = await fetch(
+        'https://api.github.com/repos/rcodeborg2311/Portfolio/commits?per_page=30',
+        { headers: { Accept: 'application/vnd.github+json' } }
+      );
+
+      if (!res.ok) throw new Error('GitHub API error');
+
+      const commits = await res.json();
+
+      loading.remove();
+
+      commits.forEach(function (c, i) {
+        const msg       = c.commit.message.split('\n')[0];
+        const author    = c.commit.author.name;
+        const dateRaw   = c.commit.author.date;
+        const sha       = c.sha.slice(0, 7);
+        const url       = c.html_url;
+        const date      = new Date(dateRaw).toLocaleDateString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric'
+        });
+
+        const el = document.createElement('div');
+        el.className = 'group flex flex-col sm:flex-row sm:items-start gap-3 py-5 hover:bg-[color:var(--color-surface)] rounded-xl px-3 -mx-3 transition-colors duration-200';
+        el.innerHTML =
+          '<div class="shrink-0 w-24">' +
+            '<a href="' + url + '" target="_blank" rel="noopener noreferrer" ' +
+               'class="font-mono text-xs tracking-widest opacity-50 group-hover:opacity-100 group-hover:text-[color:var(--color-accent)] transition-all duration-200">' +
+              sha +
+            '</a>' +
+          '</div>' +
+          '<div class="flex-1 min-w-0">' +
+            '<p class="text-base font-semibold leading-snug">' + escapeHtml(msg) + '</p>' +
+            '<p class="mt-1 text-xs opacity-55 font-mono tracking-wide">' +
+              escapeHtml(author) + ' · ' + date +
+            '</p>' +
+          '</div>' +
+          '<a href="' + url + '" target="_blank" rel="noopener noreferrer" ' +
+             'class="shrink-0 text-xs font-semibold uppercase tracking-widest opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity duration-200 self-center">' +
+            'View →' +
+          '</a>';
+
+        list.appendChild(el);
+      });
+
+    } catch (e) {
+      loading.remove();
+      error.classList.remove('hidden');
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  })();
+</script>
