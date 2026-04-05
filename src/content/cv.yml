@@ -4,9 +4,6 @@
     - title: "BS Computer Science — Arizona State University"
       description: "GPA 3.89 · Dean's List · Graduating May 2026. Coursework: OS, Algorithms, Distributed Systems, ML, NLP, Stochastic Calculus."
       datetime: "2022 – May 2026"
-    - title: "B.Tech. CS & Engineering (Data Science) — VIT Vellore"
-      description: "CGPA 8.87 · Completed first semester before transferring to ASU."
-      datetime: "Aug 2021 – Aug 2022"
 
 - id: "experience"
   heading: "Experience"
