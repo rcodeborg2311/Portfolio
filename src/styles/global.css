@@ -56,7 +56,7 @@
 		/* Light: purple dot grid — mathematical graph paper */
 		background-image: radial-gradient(
 			circle,
-			color-mix(in oklab, var(--color-accent) 35%, transparent) 1.5px,
+			color-mix(in oklab, var(--color-accent) 21%, transparent) 1.5px,
 			transparent 1.5px
 		);
 		background-size: 26px 26px;
