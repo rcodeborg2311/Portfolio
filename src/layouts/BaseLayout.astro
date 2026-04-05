@@ -21,6 +21,144 @@ const { title = site.author.name, description, image } = Astro.props;
         <BaseHead title={title} description={description} image={image} />
     </head>
     <body>
+
+        <!-- ── Splash screen ── -->
+        <div id="splash" aria-hidden="true" style="
+            position: fixed; inset: 0; z-index: 9999;
+            background: #020c1c;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 2rem;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        ">
+            <!-- Animated grid background -->
+            <canvas id="splash-canvas" style="position:absolute;inset:0;opacity:0.18;"></canvas>
+
+            <!-- Monogram -->
+            <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
+                <div id="splash-rp" style="
+                    font-family: monospace;
+                    font-size: clamp(3.5rem, 10vw, 7rem);
+                    font-weight: 800;
+                    letter-spacing: 0.15em;
+                    color: #4d9eff;
+                    opacity: 0;
+                    transform: translateY(12px);
+                    transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+                ">RP</div>
+
+                <!-- Ticker tape -->
+                <div id="splash-ticker" style="
+                    font-family: monospace;
+                    font-size: 0.7rem;
+                    letter-spacing: 0.22em;
+                    text-transform: uppercase;
+                    color: #4d9eff;
+                    opacity: 0;
+                    transition: opacity 0.5s ease 0.6s;
+                    height: 1.2em; overflow: hidden;
+                "></div>
+
+                <!-- Progress bar -->
+                <div style="width: clamp(120px, 20vw, 220px); height: 1px; background: rgba(77,158,255,0.15); border-radius: 999px; overflow:hidden; margin-top: 0.5rem;">
+                    <div id="splash-bar" style="
+                        height: 100%;
+                        width: 0%;
+                        background: #4d9eff;
+                        border-radius: 999px;
+                        box-shadow: 0 0 10px #4d9eff;
+                        transition: width 2.6s cubic-bezier(0.4,0,0.2,1) 0.4s;
+                    "></div>
+                </div>
+            </div>
+        </div>
+
+        <script is:inline>
+        (function() {
+            // ── Animated dot grid on canvas ──
+            const canvas = document.getElementById('splash-canvas');
+            const ctx    = canvas.getContext('2d');
+            let W, H, dots, raf;
+
+            function resize() {
+                W = canvas.width  = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+                dots = [];
+                const gap = 36;
+                for (let x = gap/2; x < W; x += gap) {
+                    for (let y = gap/2; y < H; y += gap) {
+                        dots.push({ x, y, phase: Math.random() * Math.PI * 2 });
+                    }
+                }
+            }
+
+            function drawGrid(t) {
+                ctx.clearRect(0, 0, W, H);
+                dots.forEach(function(d) {
+                    const pulse = 0.3 + 0.7 * Math.pow(Math.sin(d.phase + t * 0.0008), 2);
+                    ctx.globalAlpha = pulse * 0.9;
+                    ctx.fillStyle   = '#4d9eff';
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
+            }
+
+            resize();
+            window.addEventListener('resize', resize);
+            function loop(t) { drawGrid(t); raf = requestAnimationFrame(loop); }
+            raf = requestAnimationFrame(loop);
+
+            // ── Ticker strings ──
+            var lines = [
+                'Calibrating Heston model…',
+                'Solving Avellaneda–Stoikov…',
+                'Training PPO agent…',
+                'Parsing ITCH 5.0 feed…',
+                'Running Monte Carlo…',
+                'Optimising lock-free LOB…',
+                'Loading portfolio…',
+            ];
+            var ticker   = document.getElementById('splash-ticker');
+            var rp       = document.getElementById('splash-rp');
+            var bar      = document.getElementById('splash-bar');
+            var lineIdx  = 0;
+
+            // Fade in RP
+            requestAnimationFrame(function() {
+                rp.style.opacity   = '1';
+                rp.style.transform = 'translateY(0)';
+                ticker.style.opacity = '1';
+            });
+
+            // Animate progress bar
+            setTimeout(function() { bar.style.width = '100%'; }, 50);
+
+            // Cycle ticker lines
+            function nextLine() {
+                ticker.style.opacity = '0';
+                setTimeout(function() {
+                    ticker.textContent   = lines[lineIdx % lines.length];
+                    ticker.style.opacity = '1';
+                    lineIdx++;
+                }, 200);
+            }
+            nextLine();
+            var tickInterval = setInterval(nextLine, 700);
+
+            // ── Dismiss after 3s ──
+            setTimeout(function() {
+                clearInterval(tickInterval);
+                cancelAnimationFrame(raf);
+                var splash = document.getElementById('splash');
+                splash.style.opacity   = '0';
+                splash.style.transform = 'scale(1.04)';
+                setTimeout(function() { splash.style.display = 'none'; }, 700);
+            }, 3000);
+        })();
+        </script>
+
         <Header />
         <main class="content-shell">
             <slot />
