@@ -32,36 +32,36 @@ import PageLayout from '../layouts/PageLayout.astro';
     <!-- ── Graph area ── -->
     <div class="mt-12 w-full">
 
-      <!-- Top bar -->
-      <div class="flex items-center justify-between mb-3">
+      <!-- Top bar: total + legend -->
+      <div class="flex items-center justify-between mb-4">
         <p id="heatmap-loading" class="font-mono text-xs uppercase tracking-widest opacity-40">Loading…</p>
-        <p id="heatmap-total"   class="font-mono text-sm tracking-widest opacity-55 hidden"></p>
+        <p id="heatmap-total" class="font-mono text-sm tracking-widest opacity-70 hidden"></p>
         <div class="flex items-center gap-2 ml-auto">
-          <span class="font-mono text-[0.6rem] uppercase tracking-widest opacity-35">Less</span>
-          <span id="legend" class="flex gap-[5px]"></span>
-          <span class="font-mono text-[0.6rem] uppercase tracking-widest opacity-35">More</span>
+          <span class="font-mono text-xs opacity-50">No activity</span>
+          <span id="legend" class="flex gap-[4px]"></span>
+          <span class="font-mono text-xs opacity-50">High activity</span>
         </div>
       </div>
 
-      <!-- Month labels -->
-      <div class="flex" style="padding-left: 36px;">
-        <div id="month-labels" class="flex w-full" style="gap: 0;"></div>
+      <!-- Month labels row -->
+      <div class="flex" style="padding-left: 44px;">
+        <div id="month-labels" class="flex" style="gap: 0;"></div>
       </div>
 
       <!-- Day labels + grid -->
       <div class="flex gap-2 mt-1 w-full">
         <!-- Day-of-week labels -->
-        <div class="flex flex-col shrink-0" id="day-labels" style="gap: 0; width: 32px;">
-          {['Mon','','Wed','','Fri','',''].map(d => (
-            <div id="day-label-row" class="flex items-center justify-end pr-1">
-              <span class="font-mono text-[0.6rem] opacity-30 tracking-wide">{d}</span>
+        <div class="flex flex-col shrink-0" style="width: 40px; gap: 0;">
+          {['Mon','','Wed','','Fri','','Sun'].map(d => (
+            <div id="day-label-row" class="flex items-center justify-end pr-2">
+              <span class="font-mono text-xs opacity-45 tracking-wide">{d}</span>
             </div>
           ))}
         </div>
 
         <!-- Graph container -->
         <div id="graph-container" class="relative flex-1 cursor-pointer select-none" style="line-height:0;">
-          <div id="heatmap" class="grid w-full" style="grid-template-rows: repeat(7, 1fr);"></div>
+          <div id="heatmap" class="grid" style="grid-template-rows: repeat(7, 1fr);"></div>
 
           <!-- Snake canvas overlay -->
           <canvas id="snake-canvas"
@@ -158,10 +158,10 @@ import PageLayout from '../layouts/PageLayout.astro';
   const firstRow = (new Date(days[0]).getDay()+6)%7; // Mon=0
   const cols     = Math.ceil((firstRow + days.length) / 7);
 
-  // Compute cell size from container width
+  // Compute cell size — cap at 18px so it never looks bloated
   function calcCell() {
     const availW = container.offsetWidth;
-    return Math.floor((availW - (cols-1)*GAP) / cols);
+    return Math.min(18, Math.floor((availW - (cols-1)*GAP) / cols));
   }
 
   function buildGrid(CELL) {
@@ -174,6 +174,7 @@ import PageLayout from '../layouts/PageLayout.astro';
     // Update day-label row heights
     document.querySelectorAll('#day-label-row').forEach(function(el) {
       el.style.height = (CELL+GAP)+'px';
+      el.style.minHeight = (CELL+GAP)+'px';
     });
 
     heatmap.style.gridTemplateColumns = 'repeat('+cols+', '+CELL+'px)';
@@ -197,7 +198,7 @@ import PageLayout from '../layouts/PageLayout.astro';
       const day   = days[Math.max(0, Math.min(di, days.length-1))];
       const month = day ? new Date(day).toLocaleDateString('en-US',{month:'short'}) : '';
       const span  = document.createElement('span');
-      span.style.cssText = 'font-family:monospace;font-size:0.6rem;opacity:0.35;width:'+(CELL+GAP)+'px;display:inline-block;letter-spacing:0.05em;';
+      span.style.cssText = 'font-family:monospace;font-size:0.72rem;font-weight:600;opacity:0.55;width:'+(CELL+GAP)+'px;display:inline-block;letter-spacing:0.04em;';
       span.textContent = (month && !seen[month]) ? (seen[month]=1,month) : '';
       monthRow.appendChild(span);
     }
@@ -222,7 +223,8 @@ import PageLayout from '../layouts/PageLayout.astro';
         cell.style.opacity = (0.28+t*0.72).toFixed(2);
         if (count>1) cell.style.boxShadow='0 0 10px color-mix(in oklab,var(--color-accent) '+Math.round(t*50)+'%,transparent)';
       }
-      cell.title = count===0 ? 'No contributions · '+day : count+' contribution'+(count>1?'s':'')+' · '+day;
+      const label = count===0 ? 'No contributions on '+day : count+' contribution'+(count>1?'s':'')+' on '+day;
+    cell.setAttribute('data-tip', label);
       heatmap.appendChild(cell);
     });
 
@@ -237,6 +239,23 @@ import PageLayout from '../layouts/PageLayout.astro';
   loading.remove();
   totalEl.textContent = total+' contributions since December 1';
   totalEl.classList.remove('hidden');
+
+  // ── Floating tooltip ──────────────────────────────────────
+  const tip = document.createElement('div');
+  tip.id = 'heat-tip';
+  tip.style.cssText = 'position:fixed;z-index:200;pointer-events:none;opacity:0;transition:opacity 120ms ease;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:6px 12px;font-family:monospace;font-size:0.72rem;letter-spacing:0.06em;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.18);';
+  document.body.appendChild(tip);
+
+  container.addEventListener('mousemove', function(e) {
+    const el = e.target.closest('[data-tip]');
+    if (!el) { tip.style.opacity='0'; return; }
+    tip.textContent = el.getAttribute('data-tip');
+    tip.style.opacity = '1';
+    const x = e.clientX, y = e.clientY;
+    tip.style.left = (x + 14)+'px';
+    tip.style.top  = (y - 32)+'px';
+  });
+  container.addEventListener('mouseleave', function() { tip.style.opacity='0'; });
 
   // Reflow on resize
   let resizeTimer;
