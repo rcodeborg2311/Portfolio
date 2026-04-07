@@ -7,9 +7,17 @@ import rawP2 from '../assets/photo-2.jpg';
 import rawP3 from '../assets/photo-3.jpg';
 import rawP4 from '../assets/photo-4.jpg';
 import rawP5 from '../assets/photo-5.jpg';
+import rawN1 from '../assets/1-IMG_3030.jpg';
+import rawN2 from '../assets/2-IMG_2728.jpg';
+import rawN3 from '../assets/3-IMG_2626.jpg';
+import rawN4 from '../assets/4-IMG_2444.jpg';
+import rawN5 from '../assets/5-IMG_2253.jpg';
+import rawN6 from '../assets/6-IMG_2207.jpg';
+import rawN7 from '../assets/7-IMG_2179.jpg';
+import rawN8 from '../assets/8-IMG_2024.jpg';
 
 const imgs = await Promise.all(
-	[rawP0, rawP1, rawP2, rawP3, rawP4, rawP5].map(src =>
+	[rawP0, rawP1, rawP2, rawP3, rawP4, rawP5, rawN1, rawN2, rawN3, rawN4, rawN5, rawN6, rawN7, rawN8].map(src =>
 		getImage({ src, format: 'webp' })
 	)
 );
@@ -43,7 +51,7 @@ const photoUrls = imgs.map(i => i.src);
 					<h2 class="text-base font-bold uppercase tracking-widest">Outside of Code</h2>
 					<div class="grid grid-cols-2 gap-3">
 						{[
-							{ label: "Soccer",      desc: "My reset button. Pickup games, Champions League, Sunday Leagues" },
+							{ label: "Soccer",      desc: "My reset button. Pickup games, Champions League, Sunday Leagues." },
 							{ label: "Guitar",      desc: "Still a beginner. Useful reminder that consistency beats talent." },
 							{ label: "Reading",     desc: "Kahneman, Hull, anything that changes how I think." },
 							{ label: "Photography", desc: "Street and travel. Candid moments, light, and things easy to walk past." },
